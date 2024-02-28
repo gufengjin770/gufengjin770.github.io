@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on 金谷风的博客</title>
-    <link>http://localhost:1313/post/</link>
+    <link>https://gufengjin770.github.io/post/</link>
     <description>Recent content in Posts on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 28 Feb 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://gufengjin770.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>初识神经网络：如何用梯度下降法训练一个简单的线性模型</title>
-      <link>http://localhost:1313/post/deeplearning1/</link>
+      <link>https://gufengjin770.github.io/post/deeplearning1/</link>
       <pubDate>Wed, 28 Feb 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/post/deeplearning1/</guid>
+      <guid>https://gufengjin770.github.io/post/deeplearning1/</guid>
       <description>初识神经网络：如何用梯度下降法训练一个简单的线性模型 数学模型是什么？ 数学模型能够从数据中学习并进行预测或决策。这些模型可以用于解决各种问题，包括分类 Classification, 回归 Regression等。模型通常被用来发现数据中的模式和关联，从而进行预测或做出决策。&#xA;模型通常包含输入值和输出值。输入值 Input通常是一组特征或属性，用来描述数据的各个方面。输出值 Output则是模型根据输入值进行预测或分类的结果。&#xA;在监督学习 Supervised learning中，模型通过学习输入值和对应的输出值之间的关系来进行预测或分类。这些输入值和输出值通常被组织成训练集 Training set和验证集 Validation set，模型通过训练集学习输入和输出之间的映射关系。然后使用验证集来评估模型的性能，以便更好地了解模型在未见过的数据上的表现。通过与训练集分开的独立数据进行评估，可以更客观地判断模型的泛化能力，即模型对未知数据的适应能力。一旦训练完成，模型就可以用来对新的输入值进行预测或分类。&#xA;在 无监督学习 Unsupervised learning中，模型不需要标记的输出值，而是试图发现数据中的结构或模式。输入值被用来描述数据，而模型则尝试根据这些输入值发现数据的内在结构或者进行聚类等任务。&#xA;如何用梯度下降法 Gradient Descent Method训练一个简单的线性模型？ 先来看下如何训练监督学习类问题，我们将用梯度下降法训练一个简单的线性模型。&#xA;首先，我们需要准备包含输入值和对应输出值（标签）的数据集。在下面代码中例子里输入值是 $x = [1, 2, 3, 4]$，输出值是 $y = [2, 3, 4, 5]$。&#xA;第二步选择模型，在这个例子中我们选择线性模型， $y_{pred} = ax + b$, 其中x是输入值，$y_{pred}$是预测值，而a和b是模型的两个参数。&#xA;第三步定义损失函数，我们的目标是模型能根据输入的$x$准确的输出$y$的值，所以我们需要预测值尽可能的等于输出值，也就是$y-y_{pred}$ 尽可能接近零。我们的损失函数是均方误差（MSE），定义如下： $$ \frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-(ax_{i}+b) \right )^{2} $$ 其中，$n$ 是样本数量，$y_i$ 是实际标签，$x_i$ 是对应的特征值。我们的目标就是通过优化算法修改参数 (a,b) 让损失函数尽可能小。&#xA;第四部选择优化算法，我们选择梯度下降法训练。梯度下降法包含四个步骤，&#xA;前向传播（Forward Propagation）：使用当前的参数值对训练数据进行前向传播，得到模型的预测输出。&#xA;计算损失（Compute Loss）：将模型的预测输出与真实标签进行比较，计算损失函数的值。&#xA;反向传播（Backward Propagation）：通过损失函数，计算模型参数的梯度，即损失函数对每个参数的偏导数。&#xA;参数更新（Update Parameters）：根据梯度下降或其他优化算法，沿着梯度的反方向更新参数，使损失函数减小。&#xA;我们来计算下在这个例子中参数的梯度是什么，损失函数为 $\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-(ax_{i}+b) \right )^{2}$。 对a的偏导数为 $\frac{\partial \text{MSE}}{\partial a}$ , 这个式子可以分解为$\frac{\partial \text{MSE}}{\partial y_{pred}} \cdot \frac{\partial y_{pred}}{\partial a} $。</description>
     </item>
     <item>
       <title>Blog1</title>
-      <link>http://localhost:1313/post/blog1/</link>
+      <link>https://gufengjin770.github.io/post/blog1/</link>
       <pubDate>Sun, 25 Feb 2024 20:54:42 +0000</pubDate>
-      <guid>http://localhost:1313/post/blog1/</guid>
+      <guid>https://gufengjin770.github.io/post/blog1/</guid>
       <description>hhhhhhh</description>
     </item>
   </channel>
