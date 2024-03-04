@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    
+    <title>不依靠PyTorch和TensorFlow做手写数字识别 // 金谷风的博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.123.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Gufeng Jin" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="不依靠PyTorch和TensorFlow做手写数字识别"/>
+<meta name="twitter:description" content="不依靠PyTorch和TensorFlow做手写数字识别 这章我们来看下如何不通过调用python深度学习的库来写CNN网络。
+所有机器学习都可以看成三个步骤：
+定义方程的框架，输入是什么 输出是什么 中间如何从输入到输出
+定义损失函数 衡量模型预测与实际目标之间差异的指标。
+最优化算法 根据定义的框架和损失函数找出模型最优的参数
+在下列例子中我们用到的是MNIST 数据集，一个包含手写数字图像的经典数据集，用于机器学习和模式识别的基准测试。这些图像是 28x28 像素的灰度图像，表示手写的数字 0 到 9。在代码中，x_train 包含了 60000 个训练样本，每个样本是一个经过归一化处理的大小为 784 (28x28) 的一维数组，代表一个手写数字图像。而 t_train 则是每个样本对应的标签，使用了 one-hot 编码，表示了对应的数字类别。
+下载数据集
+import sys, os sys.path.append(os.pardir) import numpy as np from dataset.mnist import load_mnist from collections import OrderedDict (x_train, t_train), (x_test, t_test) = \ load_mnist(normalize=True, one_hot_label=True) print(x_train.shape) # (60000, 784) print(t_train.shape) # (60000, 10) 打印下图片
+import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_to_display = 2 for i in range(num_samples_to_display): sample_image = x_train[i]."/>
+
+    <meta property="og:title" content="不依靠PyTorch和TensorFlow做手写数字识别" />
+<meta property="og:description" content="不依靠PyTorch和TensorFlow做手写数字识别 这章我们来看下如何不通过调用python深度学习的库来写CNN网络。
+所有机器学习都可以看成三个步骤：
+定义方程的框架，输入是什么 输出是什么 中间如何从输入到输出
+定义损失函数 衡量模型预测与实际目标之间差异的指标。
+最优化算法 根据定义的框架和损失函数找出模型最优的参数
+在下列例子中我们用到的是MNIST 数据集，一个包含手写数字图像的经典数据集，用于机器学习和模式识别的基准测试。这些图像是 28x28 像素的灰度图像，表示手写的数字 0 到 9。在代码中，x_train 包含了 60000 个训练样本，每个样本是一个经过归一化处理的大小为 784 (28x28) 的一维数组，代表一个手写数字图像。而 t_train 则是每个样本对应的标签，使用了 one-hot 编码，表示了对应的数字类别。
+下载数据集
+import sys, os sys.path.append(os.pardir) import numpy as np from dataset.mnist import load_mnist from collections import OrderedDict (x_train, t_train), (x_test, t_test) = \ load_mnist(normalize=True, one_hot_label=True) print(x_train.shape) # (60000, 784) print(t_train.shape) # (60000, 10) 打印下图片
+import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_to_display = 2 for i in range(num_samples_to_display): sample_image = x_train[i]." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gufengjin770.github.io/post/deeplearning2/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-03-04T04:53:54+00:00" />
+<meta property="article:modified_time" content="2024-03-04T04:53:54+00:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <span class="app-header-title">金谷风的博客</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>兢兢以强</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/gufengjin770" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="mailto:gufengjin770@gmail.com" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>E-mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">不依靠PyTorch和TensorFlow做手写数字识别</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Mar 4, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          4 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <h3 id="不依靠pytorch和tensorflow做手写数字识别">不依靠PyTorch和TensorFlow做手写数字识别</h3>
+<p>这章我们来看下如何不通过调用python深度学习的库来写CNN网络。</p>
+<p>所有机器学习都可以看成三个步骤：</p>
+<p>定义方程的框架，输入是什么 输出是什么 中间如何从输入到输出</p>
+<p>定义损失函数 衡量模型预测与实际目标之间差异的指标。</p>
+<p>最优化算法 根据定义的框架和损失函数找出模型最优的参数</p>
+<p>在下列例子中我们用到的是MNIST 数据集，一个包含手写数字图像的经典数据集，用于机器学习和模式识别的基准测试。这些图像是 28x28 像素的灰度图像，表示手写的数字 0 到 9。在代码中，<code>x_train</code> 包含了 60000 个训练样本，每个样本是一个经过归一化处理的大小为 784 (28x28) 的一维数组，代表一个手写数字图像。而 <code>t_train</code> 则是每个样本对应的标签，使用了 one-hot 编码，表示了对应的数字类别。</p>
+<p>下载数据集</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> sys<span style="color:#f92672">,</span> os
+</span></span><span style="display:flex;"><span>sys<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>append(os<span style="color:#f92672">.</span>pardir)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dataset.mnist <span style="color:#f92672">import</span> load_mnist
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> OrderedDict
+</span></span><span style="display:flex;"><span>(x_train, t_train), (x_test, t_test) <span style="color:#f92672">=</span> \
+</span></span><span style="display:flex;"><span> load_mnist(normalize<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, one_hot_label<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(x_train<span style="color:#f92672">.</span>shape) <span style="color:#75715e"># (60000, 784)</span>
+</span></span><span style="display:flex;"><span>print(t_train<span style="color:#f92672">.</span>shape) <span style="color:#75715e"># (60000, 10)</span>
+</span></span></code></pre></div><p>打印下图片</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 打印前两个样本及其标签</span>
+</span></span><span style="display:flex;"><span>num_samples_to_display <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(num_samples_to_display):
+</span></span><span style="display:flex;"><span>    sample_image <span style="color:#f92672">=</span> x_train[i]<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)  <span style="color:#75715e"># 将一维数组变形为 28x28 的图像矩阵</span>
+</span></span><span style="display:flex;"><span>    label <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>argmax(t_train[i])  <span style="color:#75715e"># 获取标签</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 使用 matplotlib 绘制图像</span>
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>subplot(<span style="color:#ae81ff">1</span>, num_samples_to_display, i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>imshow(sample_image, cmap<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gray&#39;</span>)
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Label: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(label))
+</span></span><span style="display:flex;"><span>    plt<span style="color:#f92672">.</span>axis(<span style="color:#e6db74">&#39;off&#39;</span>)  <span style="color:#75715e"># 关闭坐标轴显示</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
+</span></span></code></pre></div><p><img src="../image/MNIST.png" alt="MNIST"></p>
+<p>定义层对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#激活函数</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">sigmoid</span>(a):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">+</span>np<span style="color:#f92672">.</span>exp(<span style="color:#f92672">-</span>a))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#输出转成概率</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">softmax</span>(x):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> x<span style="color:#f92672">.</span>ndim <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> x<span style="color:#f92672">.</span>T
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> x <span style="color:#f92672">-</span> np<span style="color:#f92672">.</span>max(x, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>exp(x) <span style="color:#f92672">/</span> np<span style="color:#f92672">.</span>sum(np<span style="color:#f92672">.</span>exp(x), axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> y<span style="color:#f92672">.</span>T 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> x <span style="color:#f92672">-</span> np<span style="color:#f92672">.</span>max(x) <span style="color:#75715e"># 溢出对策</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>exp(x) <span style="color:#f92672">/</span> np<span style="color:#f92672">.</span>sum(np<span style="color:#f92672">.</span>exp(x))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#损失函数</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">cross_entropy_error</span>(y, t):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> y<span style="color:#f92672">.</span>ndim <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        t <span style="color:#f92672">=</span> t<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">1</span>, t<span style="color:#f92672">.</span>size)
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> y<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">1</span>, y<span style="color:#f92672">.</span>size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    batch_size <span style="color:#f92672">=</span> y<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span>np<span style="color:#f92672">.</span>sum(t <span style="color:#f92672">*</span> np<span style="color:#f92672">.</span>log(y <span style="color:#f92672">+</span> <span style="color:#ae81ff">1e-7</span>)) <span style="color:#f92672">/</span> batch_size
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#找偏导数</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">numerical_gradient</span>(f, x):
+</span></span><span style="display:flex;"><span>    h <span style="color:#f92672">=</span> <span style="color:#ae81ff">1e-4</span> <span style="color:#75715e"># 0.0001</span>
+</span></span><span style="display:flex;"><span>    grad <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros_like(x)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    it <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>nditer(x, flags<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;multi_index&#39;</span>], op_flags<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;readwrite&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#f92672">not</span> it<span style="color:#f92672">.</span>finished:
+</span></span><span style="display:flex;"><span>        idx <span style="color:#f92672">=</span> it<span style="color:#f92672">.</span>multi_index
+</span></span><span style="display:flex;"><span>        tmp_val <span style="color:#f92672">=</span> x[idx]
+</span></span><span style="display:flex;"><span>        x[idx] <span style="color:#f92672">=</span> float(tmp_val) <span style="color:#f92672">+</span> h
+</span></span><span style="display:flex;"><span>        fxh1 <span style="color:#f92672">=</span> f(x) <span style="color:#75715e"># f(x+h)</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        x[idx] <span style="color:#f92672">=</span> tmp_val <span style="color:#f92672">-</span> h 
+</span></span><span style="display:flex;"><span>        fxh2 <span style="color:#f92672">=</span> f(x) <span style="color:#75715e"># f(x-h)</span>
+</span></span><span style="display:flex;"><span>        grad[idx] <span style="color:#f92672">=</span> (fxh1 <span style="color:#f92672">-</span> fxh2) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>h)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        x[idx] <span style="color:#f92672">=</span> tmp_val <span style="color:#75715e"># 还原值</span>
+</span></span><span style="display:flex;"><span>        it<span style="color:#f92672">.</span>iternext()   
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> grad
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Relu</span>:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>mask <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, x):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>mask <span style="color:#f92672">=</span> (x <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        out <span style="color:#f92672">=</span> x<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>        out[self<span style="color:#f92672">.</span>mask] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> out
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">backward</span>(self, dout):
+</span></span><span style="display:flex;"><span>        dout[self<span style="color:#f92672">.</span>mask] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        dx <span style="color:#f92672">=</span> dout
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> dx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Affine</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, W, b):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>W <span style="color:#f92672">=</span>W
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>b <span style="color:#f92672">=</span> b
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>x <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>original_x_shape <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 权重和偏置参数的导数</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dW <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>db <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, x):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 对应张量</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>original_x_shape <span style="color:#f92672">=</span> x<span style="color:#f92672">.</span>shape
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> x<span style="color:#f92672">.</span>reshape(x<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>], <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>x <span style="color:#f92672">=</span> x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        out <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(self<span style="color:#f92672">.</span>x, self<span style="color:#f92672">.</span>W) <span style="color:#f92672">+</span> self<span style="color:#f92672">.</span>b
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> out
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">backward</span>(self, dout):
+</span></span><span style="display:flex;"><span>        dx <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(dout, self<span style="color:#f92672">.</span>W<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dW <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(self<span style="color:#f92672">.</span>x<span style="color:#f92672">.</span>T, dout)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>db <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sum(dout, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        dx <span style="color:#f92672">=</span> dx<span style="color:#f92672">.</span>reshape(<span style="color:#f92672">*</span>self<span style="color:#f92672">.</span>original_x_shape)  <span style="color:#75715e"># 还原输入数据的形状（对应张量）</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> dx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SoftmaxWithLoss</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>loss <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>y <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span> <span style="color:#75715e"># softmax的输出</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span> <span style="color:#75715e"># 监督数据</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, x, t):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>t <span style="color:#f92672">=</span> t
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>y <span style="color:#f92672">=</span> softmax(x)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>loss <span style="color:#f92672">=</span> cross_entropy_error(self<span style="color:#f92672">.</span>y, self<span style="color:#f92672">.</span>t)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>loss
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">backward</span>(self, dout<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>        batch_size <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>t<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>t<span style="color:#f92672">.</span>size <span style="color:#f92672">==</span> self<span style="color:#f92672">.</span>y<span style="color:#f92672">.</span>size: <span style="color:#75715e"># 监督数据是one-hot-vector的情况</span>
+</span></span><span style="display:flex;"><span>            dx <span style="color:#f92672">=</span> (self<span style="color:#f92672">.</span>y <span style="color:#f92672">-</span> self<span style="color:#f92672">.</span>t) <span style="color:#f92672">/</span> batch_size
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            dx <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>y<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>            dx[np<span style="color:#f92672">.</span>arange(batch_size), self<span style="color:#f92672">.</span>t] <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            dx <span style="color:#f92672">=</span> dx <span style="color:#f92672">/</span> batch_size
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> dx
+</span></span></code></pre></div><p>定义网络对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">twolayerNet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self,  input_size, hidden_size, output_size, weight_init_std<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>params <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#34;W1&#34;</span>] <span style="color:#f92672">=</span>  weight_init_std <span style="color:#f92672">*</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>randn(input_size,hidden_size)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#34;B1&#34;</span>] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros(hidden_size)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#34;W2&#34;</span>] <span style="color:#f92672">=</span>  weight_init_std <span style="color:#f92672">*</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>randn(hidden_size,output_size)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#34;B2&#34;</span>] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros(output_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layers <span style="color:#f92672">=</span> OrderedDict()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine1&#39;</span>] <span style="color:#f92672">=</span> \
+</span></span><span style="display:flex;"><span>        Affine(self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;W1&#39;</span>], self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;B1&#39;</span>])
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Relu1&#39;</span>] <span style="color:#f92672">=</span> Relu()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine2&#39;</span>] <span style="color:#f92672">=</span> \
+</span></span><span style="display:flex;"><span>        Affine(self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;W2&#39;</span>], self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;B2&#39;</span>])
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>lastLayer <span style="color:#f92672">=</span> SoftmaxWithLoss()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">predict</span>(self,x):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> layer <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>values():
+</span></span><span style="display:flex;"><span>            x <span style="color:#f92672">=</span> layer<span style="color:#f92672">.</span>forward(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">loss</span>(self,x,t):
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>predict(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>lastLayer<span style="color:#f92672">.</span>forward(y, t)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">accuracy</span>(self,x,t):
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>predict(x)
+</span></span><span style="display:flex;"><span>        y_max <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>argmax(y,axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        t_max <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>argmax(t,axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>sum(y_max <span style="color:#f92672">==</span> t_max) <span style="color:#f92672">/</span> float(x<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">numerical_gradient</span>(self, x, t):
+</span></span><span style="display:flex;"><span>        loss_W <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> W: self<span style="color:#f92672">.</span>loss(x, t)
+</span></span><span style="display:flex;"><span>        grads <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;W1&#39;</span>] <span style="color:#f92672">=</span> numerical_gradient(loss_W, self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;W1&#39;</span>])
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;B1&#39;</span>] <span style="color:#f92672">=</span> numerical_gradient(loss_W, self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;B1&#39;</span>])
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;W2&#39;</span>] <span style="color:#f92672">=</span> numerical_gradient(loss_W, self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;W2&#39;</span>])
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;B2&#39;</span>] <span style="color:#f92672">=</span> numerical_gradient(loss_W, self<span style="color:#f92672">.</span>params[<span style="color:#e6db74">&#39;B2&#39;</span>])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> grads
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">gradient</span>(self, x, t):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># forward</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>loss(x, t)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># backward</span>
+</span></span><span style="display:flex;"><span>        dout <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        dout <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>lastLayer<span style="color:#f92672">.</span>backward(dout)
+</span></span><span style="display:flex;"><span>        layers <span style="color:#f92672">=</span> list(self<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>values())
+</span></span><span style="display:flex;"><span>        layers<span style="color:#f92672">.</span>reverse()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> layer <span style="color:#f92672">in</span> layers:
+</span></span><span style="display:flex;"><span>            dout <span style="color:#f92672">=</span> layer<span style="color:#f92672">.</span>backward(dout)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 设定</span>
+</span></span><span style="display:flex;"><span>        grads <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;W1&#39;</span>] <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine1&#39;</span>]<span style="color:#f92672">.</span>dW
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;B1&#39;</span>] <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine1&#39;</span>]<span style="color:#f92672">.</span>db
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;W2&#39;</span>] <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine2&#39;</span>]<span style="color:#f92672">.</span>dW
+</span></span><span style="display:flex;"><span>        grads[<span style="color:#e6db74">&#39;B2&#39;</span>] <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>layers[<span style="color:#e6db74">&#39;Affine2&#39;</span>]<span style="color:#f92672">.</span>db
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> grads
+</span></span><span style="display:flex;"><span>    
+</span></span></code></pre></div><p>梯度检验</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>network <span style="color:#f92672">=</span> twolayerNet(input_size<span style="color:#f92672">=</span><span style="color:#ae81ff">784</span>, hidden_size<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, output_size<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>x_batch <span style="color:#f92672">=</span> x_train[:<span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>t_batch <span style="color:#f92672">=</span> t_train[:<span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>grad_numerical <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>numerical_gradient(x_batch, t_batch)
+</span></span><span style="display:flex;"><span>grad_backprop <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>gradient(x_batch, t_batch)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 求各个权重的绝对误差的平均值</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> key <span style="color:#f92672">in</span> grad_numerical<span style="color:#f92672">.</span>keys():
+</span></span><span style="display:flex;"><span>    diff <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>average( np<span style="color:#f92672">.</span>abs(grad_backprop[key] <span style="color:#f92672">-</span> grad_numerical[key]) )
+</span></span><span style="display:flex;"><span>    print(key <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> str(diff))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&gt;&gt; W1:3.094195647812538e-10</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&gt;&gt; B1:2.1242950091990548e-09</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&gt;&gt; W2:4.7896988270535004e-09</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&gt;&gt; B2:1.4020604089531874e-07</span>
+</span></span></code></pre></div><p>训练</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 超参数</span>
+</span></span><span style="display:flex;"><span>iters_num <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>train_size <span style="color:#f92672">=</span> x_train<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>batch_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>learning_rate <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_loss_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>test_loss_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>train_acc_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>test_acc_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>iter_per_epoch <span style="color:#f92672">=</span> max(train_size <span style="color:#f92672">/</span> batch_size, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#early stopping</span>
+</span></span><span style="display:flex;"><span>best_test_loss <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>inf
+</span></span><span style="display:flex;"><span>patience <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>  <span style="color:#75715e">#几次迭代没有改善终止</span>
+</span></span><span style="display:flex;"><span>no_improvement_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>network <span style="color:#f92672">=</span> twolayerNet(input_size<span style="color:#f92672">=</span><span style="color:#ae81ff">784</span>, hidden_size<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, output_size<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(iters_num):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 获取mini-batch</span>
+</span></span><span style="display:flex;"><span>    batch_mask <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>choice(train_size, batch_size)
+</span></span><span style="display:flex;"><span>    x_batch <span style="color:#f92672">=</span> x_train[batch_mask]
+</span></span><span style="display:flex;"><span>    t_batch <span style="color:#f92672">=</span> t_train[batch_mask]
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 计算梯度</span>
+</span></span><span style="display:flex;"><span>    grad <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>gradient(x_batch, t_batch)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 更新参数</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> key <span style="color:#f92672">in</span> (<span style="color:#e6db74">&#39;W1&#39;</span>, <span style="color:#e6db74">&#39;B1&#39;</span>, <span style="color:#e6db74">&#39;W2&#39;</span>, <span style="color:#e6db74">&#39;B2&#39;</span>):
+</span></span><span style="display:flex;"><span>        network<span style="color:#f92672">.</span>params[key] <span style="color:#f92672">-=</span> learning_rate <span style="color:#f92672">*</span> grad[key]
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 记录学习过程</span>
+</span></span><span style="display:flex;"><span>    loss <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>loss(x_batch, t_batch)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;train loss is </span><span style="color:#e6db74">{</span>loss<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;train accuracy is </span><span style="color:#e6db74">{</span>network<span style="color:#f92672">.</span>accuracy(x_batch, t_batch)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    train_loss_list<span style="color:#f92672">.</span>append(loss)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    test_loss <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>loss(x_test, t_test)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;test loss is </span><span style="color:#e6db74">{</span>test_loss<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;test accuracy is </span><span style="color:#e6db74">{</span>network<span style="color:#f92672">.</span>accuracy(x_test, t_test)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    test_loss_list<span style="color:#f92672">.</span>append(test_loss)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    train_acc <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>accuracy(x_train, t_train)
+</span></span><span style="display:flex;"><span>    test_acc <span style="color:#f92672">=</span> network<span style="color:#f92672">.</span>accuracy(x_test, t_test)
+</span></span><span style="display:flex;"><span>    train_acc_list<span style="color:#f92672">.</span>append(train_acc)
+</span></span><span style="display:flex;"><span>    test_acc_list<span style="color:#f92672">.</span>append(test_acc)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> test_loss <span style="color:#f92672">&lt;</span> best_test_loss:
+</span></span><span style="display:flex;"><span>        best_test_loss <span style="color:#f92672">=</span> test_loss
+</span></span><span style="display:flex;"><span>        no_improvement_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        no_improvement_count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Early stopping condition</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> no_improvement_count <span style="color:#f92672">&gt;=</span> patience:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Early stopping: No improvement in test loss for </span><span style="color:#e6db74">{}</span><span style="color:#e6db74"> epochs.&#34;</span><span style="color:#f92672">.</span>format(patience))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>    
+</span></span></code></pre></div><p>损失图展示</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>subplot(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>plot(train_loss_list, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Train Loss&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>plot(test_loss_list, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Test Loss&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>xlabel(<span style="color:#e6db74">&#39;Iterations&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>ylabel(<span style="color:#e6db74">&#39;Loss&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Train and Test Loss&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>legend()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plotting train accuracy and test accuracy</span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>subplot(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>plot(train_acc_list, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Train Accuracy&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>plot(test_acc_list, label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Test Accuracy&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>xlabel(<span style="color:#e6db74">&#39;Iterations&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>ylabel(<span style="color:#e6db74">&#39;Accuracy&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Train and Test Accuracy&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>legend()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>tight_layout()
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
+</span></span></code></pre></div><p><img src="../image/loss_plot.png" alt="loss plot"></p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

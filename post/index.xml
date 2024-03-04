@@ -6,8 +6,15 @@
     <description>Recent content in Posts on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 Mar 2024 04:53:54 +0000</lastBuildDate>
     <atom:link href="https://gufengjin770.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>不依靠PyTorch和TensorFlow做手写数字识别</title>
+      <link>https://gufengjin770.github.io/post/deeplearning2/</link>
+      <pubDate>Mon, 04 Mar 2024 04:53:54 +0000</pubDate>
+      <guid>https://gufengjin770.github.io/post/deeplearning2/</guid>
+      <description>不依靠PyTorch和TensorFlow做手写数字识别 这章我们来看下如何不通过调用python深度学习的库来写CNN网络。&#xA;所有机器学习都可以看成三个步骤：&#xA;定义方程的框架，输入是什么 输出是什么 中间如何从输入到输出&#xA;定义损失函数 衡量模型预测与实际目标之间差异的指标。&#xA;最优化算法 根据定义的框架和损失函数找出模型最优的参数&#xA;在下列例子中我们用到的是MNIST 数据集，一个包含手写数字图像的经典数据集，用于机器学习和模式识别的基准测试。这些图像是 28x28 像素的灰度图像，表示手写的数字 0 到 9。在代码中，x_train 包含了 60000 个训练样本，每个样本是一个经过归一化处理的大小为 784 (28x28) 的一维数组，代表一个手写数字图像。而 t_train 则是每个样本对应的标签，使用了 one-hot 编码，表示了对应的数字类别。&#xA;下载数据集&#xA;import sys, os sys.path.append(os.pardir) import numpy as np from dataset.mnist import load_mnist from collections import OrderedDict (x_train, t_train), (x_test, t_test) = \ load_mnist(normalize=True, one_hot_label=True) print(x_train.shape) # (60000, 784) print(t_train.shape) # (60000, 10) 打印下图片&#xA;import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_to_display = 2 for i in range(num_samples_to_display): sample_image = x_train[i].</description>
+    </item>
     <item>
       <title>初识神经网络：如何用梯度下降法训练一个简单的线性模型</title>
       <link>https://gufengjin770.github.io/post/deeplearning1/</link>
