@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en-us">
-  <head>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
     
     <title>不依靠PyTorch和TensorFlow做手写数字识别 // 金谷风的博客</title>
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_
 import sys, os sys.path.append(os.pardir) import numpy as np from dataset.mnist import load_mnist from collections import OrderedDict (x_train, t_train), (x_test, t_test) = \ load_mnist(normalize=True, one_hot_label=True) print(x_train.shape) # (60000, 784) print(t_train.shape) # (60000, 10) 打印下图片
 import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_to_display = 2 for i in range(num_samples_to_display): sample_image = x_train[i]." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://gufengjin770.github.io/post/deeplearning2/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="http://localhost:1313/post/deeplearning2/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2024-03-04T04:53:54+00:00" />
 <meta property="article:modified_time" content="2024-03-04T04:53:54+00:00" />
 
@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt # 打印前两个样本及其标签 num_samples_
   </head>
   <body>
     <header class="app-header">
-      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <a href="http://localhost:1313/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
       <span class="app-header-title">金谷风的博客</span>
       <nav class="app-header-menu">
           <a class="app-header-menu-item" href="/">Home</a>
