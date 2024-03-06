@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>算法algorithm on 金谷风的博客</title>
-    <link>http://localhost:1313/tags/%E7%AE%97%E6%B3%95algorithm/</link>
+    <link>https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/</link>
     <description>Recent content in 算法algorithm on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 06 Mar 2024 21:20:34 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/%E7%AE%97%E6%B3%95algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kmeans</title>
-      <link>http://localhost:1313/post/kmeans/</link>
+      <link>https://gufengjin770.github.io/post/kmeans/</link>
       <pubDate>Wed, 06 Mar 2024 21:20:34 +0000</pubDate>
-      <guid>http://localhost:1313/post/kmeans/</guid>
+      <guid>https://gufengjin770.github.io/post/kmeans/</guid>
       <description>kmeans++算法 K均值++（K-means++）是一种改进的K均值聚类算法，旨在解决传统K均值算法在初始质心选择上的随机性问题，提高了算法的收敛速度和聚类质量。&#xA;K均值算法是一种常用的无监督聚类方法，其基本思想是将数据集划分为K个簇，使得同一簇内的数据点彼此相似，而不同簇之间的数据点尽可能不相似。该算法的主要步骤包括选择初始质心、分配数据点到最近的质心所属的簇、更新质心位置等。&#xA;K均值++算法通过改进初始质心的选择，来提高K均值算法的效果。其主要思想是在选择初始质心时，首先选择一个质心作为第一个簇的中心，然后按照一定的概率分布选择下一个质心，使得离已选择的质心越远的点被选作下一个质心的概率越大，以此类推，直到选择完所有的初始质心。这样做可以避免初始质心选择过于集中或者过于分散的情况，提高了算法的鲁棒性和收敛速度。&#xA;K均值++算法的步骤如下：&#xA;从数据集中随机选择一个点作为第一个质心。 对于数据集中的每个点，计算其到已选择的质心的距离，并选择一个距离当前已选择质心最远的点作为下一个质心，选择的概率与距离的平方成正比。 重复步骤2，直到选择完所有的质心。 使用K均值算法进行迭代优化，直到质心不再发生变化或者达到最大迭代次数。 K均值++算法相比传统K均值算法，在相同迭代次数下能够得到更好的聚类效果，并且对初始质心的选择更加稳定和可靠。因此，在实际应用中，K均值++算法更为常用。&#xA;import numpy as np # 使用库函数计算欧氏距离 def euclidean(point1, point2): return np.linalg.norm(point1 - point2) # 使用K均值++算法选择初始质心 def initialize_centroids(data, num_clusters): centroids = np.zeros((num_clusters, data.shape[1])) centroids[0] = data[np.random.randint(0, len(data))] for i in range(1, num_clusters): distances = np.array([min([euclidean(point, centroid) for centroid in centroids[:i]]) for point in data]) probabilities = distances / distances.sum() centroids[i] = data[np.random.choice(len(data), p=probabilities)] return centroids # K均值算法 def kmeans(data, num_clusters, max_iter=100, tol=1e-4): centroids = initialize_centroids(data, num_clusters) for _ in range(max_iter): # 分配数据点到最近的质心 clusters = {i: [] for i in range(num_clusters)} for point in data: distances = [euclidean(point, centroid) for centroid in centroids] cluster = np.</description>
     </item>
   </channel>

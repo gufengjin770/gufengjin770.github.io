@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en-us">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
     
     <title>Kmeans // 金谷风的博客</title>
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -29,7 +29,7 @@ K均值&#43;&#43;算法的步骤如下：
 从数据集中随机选择一个点作为第一个质心。 对于数据集中的每个点，计算其到已选择的质心的距离，并选择一个距离当前已选择质心最远的点作为下一个质心，选择的概率与距离的平方成正比。 重复步骤2，直到选择完所有的质心。 使用K均值算法进行迭代优化，直到质心不再发生变化或者达到最大迭代次数。 K均值&#43;&#43;算法相比传统K均值算法，在相同迭代次数下能够得到更好的聚类效果，并且对初始质心的选择更加稳定和可靠。因此，在实际应用中，K均值&#43;&#43;算法更为常用。
 import numpy as np # 使用库函数计算欧氏距离 def euclidean(point1, point2): return np.linalg.norm(point1 - point2) # 使用K均值&#43;&#43;算法选择初始质心 def initialize_centroids(data, num_clusters): centroids = np.zeros((num_clusters, data.shape[1])) centroids[0] = data[np.random.randint(0, len(data))] for i in range(1, num_clusters): distances = np.array([min([euclidean(point, centroid) for centroid in centroids[:i]]) for point in data]) probabilities = distances / distances.sum() centroids[i] = data[np.random.choice(len(data), p=probabilities)] return centroids # K均值算法 def kmeans(data, num_clusters, max_iter=100, tol=1e-4): centroids = initialize_centroids(data, num_clusters) for _ in range(max_iter): # 分配数据点到最近的质心 clusters = {i: [] for i in range(num_clusters)} for point in data: distances = [euclidean(point, centroid) for centroid in centroids] cluster = np." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/kmeans/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://gufengjin770.github.io/post/kmeans/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2024-03-06T21:20:34+00:00" />
 <meta property="article:modified_time" content="2024-03-06T21:20:34+00:00" />
 
@@ -38,7 +38,7 @@ import numpy as np # 使用库函数计算欧氏距离 def euclidean(point1, poi
   </head>
   <body>
     <header class="app-header">
-      <a href="http://localhost:1313/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
       <span class="app-header-title">金谷风的博客</span>
       <nav class="app-header-menu">
           <a class="app-header-menu-item" href="/">Home</a>
@@ -93,7 +93,7 @@ import numpy as np # 使用库函数计算欧氏距离 def euclidean(point1, poi
   <title>tag</title>
   <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
 </svg>
-              <a class="tag" href="http://localhost:1313/tags/%E7%AE%97%E6%B3%95algorithm/">算法algorithm</a>
+              <a class="tag" href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/">算法algorithm</a>
         </div>
       </div>
     </header>
