@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    
+    <title>DBSCAN // 金谷风的博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.123.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Gufeng Jin" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="DBSCAN"/>
+<meta name="twitter:description" content="DBSCAN（Density-Based Spatial Clustering of Applications with Noise） 是一种基于密度的聚类算法，能够识别任意形状的簇，并能够有效地处理噪声数据。DBSCAN通过定义一定的密度阈值来识别簇，而不需要事先指定簇的数量。
+DBSCAN的主要思想是根据数据点的密度来确定簇的边界。它的工作原理如下：
+核心点（Core Points）：对于给定的密度参数ε（epsilon）和最小邻域内的点数目minPts，如果一个点的ε-邻域（包括该点在内的半径为ε的区域）内至少包含minPts个数据点，则这个点被称为核心点。
+直接密度可达（Directly Density-Reachable）：如果一个点在另一个点的ε-邻域内，并且这个点是核心点，则这个点被认为是直接密度可达的。
+密度可达（Density-Reachable）：如果存在一系列核心点，使得从第一个核心点到最后一个核心点经过的每个核心点都是直接密度可达的，则最后一个核心点是从第一个核心点密度可达的。
+密度相连（Density-Connected）：如果存在一个核心点C，使得点A和点B都是从核心点C密度可达的，则点A和点B被认为是密度相连的。
+基于以上定义，DBSCAN算法将数据点分为三种类型：核心点、边界点和噪声点。核心点属于一个簇，边界点位于某个簇的边界上，而噪声点不属于任何簇。
+DBSCAN的优点包括对噪声和离群点的鲁棒性、能够发现任意形状的簇、不需要事先指定簇的数量等。但是，DBSCAN的性能受到密度参数ε和最小邻域内的点数目minPts的选择影响较大，需要调参来获得最佳结果。
+import numpy as np def euclidean_distance(x1, x2): return np.sqrt(np.sum((x1 - x2)**2)) def range_query(data, point_index, eps): neighbors = [] for i in range(len(data)): if euclidean_distance(data[point_index], data[i]) &lt;= eps: neighbors.append(i) return neighbors def dbscan(data, eps, min_samples): labels = np.full(len(data), -1) # -1表示噪声点 cluster_id = 0 for i in range(len(data)): if labels[i] != -1: continue neighbors = range_query(data, i, eps) if len(neighbors) &lt; min_samples: labels[i] = -1 # 标记为噪声点 else: cluster_id &#43;= 1 labels[i] = cluster_id expand_cluster(data, labels, i, neighbors, cluster_id, eps, min_samples) cluster = { f&#34;group{i}&#34; : [] for i in set(labels)} for i in range(len(data)): cluster[f&#34;group{labels[i]}&#34;]."/>
+
+    <meta property="og:title" content="DBSCAN" />
+<meta property="og:description" content="DBSCAN（Density-Based Spatial Clustering of Applications with Noise） 是一种基于密度的聚类算法，能够识别任意形状的簇，并能够有效地处理噪声数据。DBSCAN通过定义一定的密度阈值来识别簇，而不需要事先指定簇的数量。
+DBSCAN的主要思想是根据数据点的密度来确定簇的边界。它的工作原理如下：
+核心点（Core Points）：对于给定的密度参数ε（epsilon）和最小邻域内的点数目minPts，如果一个点的ε-邻域（包括该点在内的半径为ε的区域）内至少包含minPts个数据点，则这个点被称为核心点。
+直接密度可达（Directly Density-Reachable）：如果一个点在另一个点的ε-邻域内，并且这个点是核心点，则这个点被认为是直接密度可达的。
+密度可达（Density-Reachable）：如果存在一系列核心点，使得从第一个核心点到最后一个核心点经过的每个核心点都是直接密度可达的，则最后一个核心点是从第一个核心点密度可达的。
+密度相连（Density-Connected）：如果存在一个核心点C，使得点A和点B都是从核心点C密度可达的，则点A和点B被认为是密度相连的。
+基于以上定义，DBSCAN算法将数据点分为三种类型：核心点、边界点和噪声点。核心点属于一个簇，边界点位于某个簇的边界上，而噪声点不属于任何簇。
+DBSCAN的优点包括对噪声和离群点的鲁棒性、能够发现任意形状的簇、不需要事先指定簇的数量等。但是，DBSCAN的性能受到密度参数ε和最小邻域内的点数目minPts的选择影响较大，需要调参来获得最佳结果。
+import numpy as np def euclidean_distance(x1, x2): return np.sqrt(np.sum((x1 - x2)**2)) def range_query(data, point_index, eps): neighbors = [] for i in range(len(data)): if euclidean_distance(data[point_index], data[i]) &lt;= eps: neighbors.append(i) return neighbors def dbscan(data, eps, min_samples): labels = np.full(len(data), -1) # -1表示噪声点 cluster_id = 0 for i in range(len(data)): if labels[i] != -1: continue neighbors = range_query(data, i, eps) if len(neighbors) &lt; min_samples: labels[i] = -1 # 标记为噪声点 else: cluster_id &#43;= 1 labels[i] = cluster_id expand_cluster(data, labels, i, neighbors, cluster_id, eps, min_samples) cluster = { f&#34;group{i}&#34; : [] for i in set(labels)} for i in range(len(data)): cluster[f&#34;group{labels[i]}&#34;]." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gufengjin770.github.io/post/dbscan/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-03-09T13:22:41+00:00" />
+<meta property="article:modified_time" content="2024-03-09T13:22:41+00:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <span class="app-header-title">金谷风的博客</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>兢兢以强</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/gufengjin770" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="mailto:gufengjin770@gmail.com" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>E-mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">DBSCAN</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Mar 9, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          1 min read
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
+  <title>tag</title>
+  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+</svg>
+              <a class="tag" href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/">算法algorithm</a>
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <h4 id="dbscandensity-based-spatial-clustering-of-applications-with-noise">DBSCAN（Density-Based Spatial Clustering of Applications with Noise）</h4>
+<p>是一种基于密度的聚类算法，能够识别任意形状的簇，并能够有效地处理噪声数据。DBSCAN通过定义一定的密度阈值来识别簇，而不需要事先指定簇的数量。</p>
+<p>DBSCAN的主要思想是根据数据点的密度来确定簇的边界。它的工作原理如下：</p>
+<p>核心点（Core Points）：对于给定的密度参数ε（epsilon）和最小邻域内的点数目minPts，如果一个点的ε-邻域（包括该点在内的半径为ε的区域）内至少包含minPts个数据点，则这个点被称为核心点。</p>
+<p>直接密度可达（Directly Density-Reachable）：如果一个点在另一个点的ε-邻域内，并且这个点是核心点，则这个点被认为是直接密度可达的。</p>
+<p>密度可达（Density-Reachable）：如果存在一系列核心点，使得从第一个核心点到最后一个核心点经过的每个核心点都是直接密度可达的，则最后一个核心点是从第一个核心点密度可达的。</p>
+<p>密度相连（Density-Connected）：如果存在一个核心点C，使得点A和点B都是从核心点C密度可达的，则点A和点B被认为是密度相连的。</p>
+<p>基于以上定义，DBSCAN算法将数据点分为三种类型：核心点、边界点和噪声点。核心点属于一个簇，边界点位于某个簇的边界上，而噪声点不属于任何簇。</p>
+<p>DBSCAN的优点包括对噪声和离群点的鲁棒性、能够发现任意形状的簇、不需要事先指定簇的数量等。但是，DBSCAN的性能受到密度参数ε和最小邻域内的点数目minPts的选择影响较大，需要调参来获得最佳结果。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">euclidean_distance</span>(x1, x2):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> np<span style="color:#f92672">.</span>sqrt(np<span style="color:#f92672">.</span>sum((x1 <span style="color:#f92672">-</span> x2)<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">range_query</span>(data, point_index, eps):
+</span></span><span style="display:flex;"><span>    neighbors <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data)):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> euclidean_distance(data[point_index], data[i]) <span style="color:#f92672">&lt;=</span> eps:
+</span></span><span style="display:flex;"><span>            neighbors<span style="color:#f92672">.</span>append(i)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> neighbors
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">dbscan</span>(data, eps, min_samples):
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>full(len(data), <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)  <span style="color:#75715e"># -1表示噪声点</span>
+</span></span><span style="display:flex;"><span>    cluster_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data)):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> labels[i] <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        neighbors <span style="color:#f92672">=</span> range_query(data, i, eps)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(neighbors) <span style="color:#f92672">&lt;</span> min_samples:
+</span></span><span style="display:flex;"><span>            labels[i] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>  <span style="color:#75715e"># 标记为噪声点</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            cluster_id <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            labels[i] <span style="color:#f92672">=</span> cluster_id
+</span></span><span style="display:flex;"><span>            expand_cluster(data, labels, i, neighbors, cluster_id, eps, min_samples)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    cluster <span style="color:#f92672">=</span> { <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;group</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> : [] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> set(labels)}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data)):
+</span></span><span style="display:flex;"><span>        cluster[<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;group</span><span style="color:#e6db74">{</span>labels[i]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>]<span style="color:#f92672">.</span>append(data[i]<span style="color:#f92672">.</span>tolist())
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> cluster
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">expand_cluster</span>(data, labels, point_index, neighbors, cluster_id, eps, min_samples):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> neighbor <span style="color:#f92672">in</span> neighbors:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> labels[neighbor] <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>            labels[neighbor] <span style="color:#f92672">=</span> cluster_id
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> labels[neighbor] <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        labels[neighbor] <span style="color:#f92672">=</span> cluster_id
+</span></span><span style="display:flex;"><span>        new_neighbors <span style="color:#f92672">=</span> range_query(data, neighbor, eps)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(new_neighbors) <span style="color:#f92672">&gt;=</span> min_samples:
+</span></span><span style="display:flex;"><span>            neighbors<span style="color:#f92672">.</span>extend(new_neighbors) <span style="color:#75715e">#动态扩展</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例数据</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array([[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>], [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2</span>], [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>], [<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">7</span>], [<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">8</span>], [<span style="color:#ae81ff">25</span>, <span style="color:#ae81ff">80</span>]])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置参数</span>
+</span></span><span style="display:flex;"><span>eps <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>min_samples <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 运行DBSCAN算法</span>
+</span></span><span style="display:flex;"><span>cluster <span style="color:#f92672">=</span> dbscan(data, eps, min_samples)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Cluster Labels:&#34;</span>, cluster)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&gt;&gt; Cluster Labels: {&#39;group1&#39;: [[1, 2], [2, 2], [2, 3]], &#39;group2&#39;: [[8, 7], [8, 8]], &#39;group-1&#39;: [[25, 80]]}</span>
+</span></span></code></pre></div>
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

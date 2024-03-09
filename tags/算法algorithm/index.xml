@@ -6,8 +6,29 @@
     <description>Recent content in 算法algorithm on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 06 Mar 2024 21:20:34 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Mar 2024 13:24:55 +0000</lastBuildDate>
     <atom:link href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hierarchical_clustering</title>
+      <link>https://gufengjin770.github.io/post/hierarchical_clustering/</link>
+      <pubDate>Sat, 09 Mar 2024 13:24:55 +0000</pubDate>
+      <guid>https://gufengjin770.github.io/post/hierarchical_clustering/</guid>
+      <description>Hierarchical clustering（层次聚类） 是一种用于数据分析的聚类算法。它通过计算数据点之间的相似度或距离，并将最相似的数据点组合成簇，然后逐步合并这些簇，直到所有的数据点都被聚合到一个簇为止。这个过程形成了一个树状的结构，称为聚类树或者树状图。这种树状结构可以帮助我们理解数据的层次结构，并且不需要事先指定聚类的数量。&#xA;在层次聚类中，有两种主要的方法：凝聚聚类（agglomerative clustering）和分裂聚类（divisive clustering）。&#xA;凝聚聚类：该方法从每个数据点作为一个簇开始，然后逐步合并最相似的簇，直到所有的数据点都聚合到一个簇为止。 分裂聚类：与凝聚聚类相反，该方法从所有的数据点作为一个簇开始，然后逐步将最不相似的簇分裂成更小的簇，直到每个数据点都成为一个单独的簇。 层次聚类的优点之一是不需要事先指定聚类的数量，因为它可以根据数据的结构自动形成聚类。然而，它的计算复杂度通常比其他聚类算法高，特别是当数据集很大时。&#xA;凝聚聚类其步骤通常如下：&#xA;初始化：将每个数据点视为一个单独的簇。 计算相似度：计算每一对簇之间的相似度或距离。常用的距离度量包括欧氏距离、曼哈顿距离、闵可夫斯基距离等。 合并最相似的簇：找到相似度最高的两个簇，将它们合并成一个新的簇。 更新相似度矩阵：更新相似度矩阵，以反映新形成的簇与其他簇之间的相似度。 重复步骤3和4：重复步骤3和4，直到只剩下一个簇，即所有的数据点都被聚合到一个簇为止。 生成聚类树：根据合并的顺序，生成一棵树状结构，称为聚类树或者树状图。这个树状结构反映了数据点的层次结构和聚类的关系。 这段代码实现的是层次聚类中的最小距离法（Single Linkage）。在每一次迭代中，它会计算所有两两组合之间的距离，并将距离最近的两个组合并成一个新的组。然后重复这个过程，直到只剩下一个组。&#xA;import numpy as np def euclidean_distance(x1, x2): return np.sqrt(np.sum((x1 - x2)**2)) def distance_between_groups(i, j): return euclidean_distance(np.mean(cluster[f&amp;#34;group{i}&amp;#34;], axis=0), np.mean(cluster[f&amp;#34;group{j}&amp;#34;], axis=0)) data = np.array([[1, 2], [2, 2], [2, 3], [8, 7], [8, 8], [25, 80]]) cluster = {f&amp;#34;group{i}&amp;#34;: [data[i].tolist()] for i in range(len(data))} while len(cluster) &amp;gt; 1: nearest_distance = float(&amp;#39;inf&amp;#39;) for i in range(len(cluster) - 1): for j in range(i + 1, len(cluster)): d = distance_between_groups(i, j) if d &amp;lt; nearest_distance: nearest_distance = d ni, nj = i, j # 合并两个组的数据 group1_data = cluster[f&amp;#34;group{ni}&amp;#34;] group2_data = cluster[f&amp;#34;group{nj}&amp;#34;] merged_data = group1_data + group2_data # 删除被合并的组 del cluster[f&amp;#34;group{ni}&amp;#34;] del cluster[f&amp;#34;group{nj}&amp;#34;] # 更新 cluster 字典中的键 for i, (key, value) in enumerate(cluster.</description>
+    </item>
+    <item>
+      <title>K Medoids</title>
+      <link>https://gufengjin770.github.io/post/k-medoids/</link>
+      <pubDate>Sat, 09 Mar 2024 13:23:56 +0000</pubDate>
+      <guid>https://gufengjin770.github.io/post/k-medoids/</guid>
+      <description>K-Medoids 是一种聚类算法，它是K-Means的一种变体。在K-Medoids算法中，每个簇的代表不再是簇内所有点的平均值（即簇的中心），而是选择簇内最能代表该簇的点，这些点被称为medoids。与K-Means相比，K-Medoids更有效地处理数据中的异常值和噪声。&#xA;import numpy as np # 使用库函数计算欧氏距离 def euclidean(point1, point2): return np.linalg.norm(point1 - point2) # 使用K-Medoids算法选择初始medoids def initialize_medoids(data, num_clusters): medoids = np.zeros((num_clusters, data.shape[1])) medoids[0] = data[np.random.randint(0, len(data))] for i in range(1, num_clusters): distances = np.array([min([euclidean(point, medoid) for medoid in medoids[:i]]) for point in data]) probabilities = distances / distances.sum() medoids[i] = data[np.random.choice(len(data), p=probabilities)] return medoids # K-Medoids算法 def kmedoids(data, num_clusters, max_iter=100, tol=1e-4): medoids = initialize_medoids(data, num_clusters) for _ in range(max_iter): # 分配数据点到最近的medoid clusters = {i: [] for i in range(num_clusters)} for point in data: distances = [euclidean(point, medoid) for medoid in medoids] cluster = np.</description>
+    </item>
+    <item>
+      <title>DBSCAN</title>
+      <link>https://gufengjin770.github.io/post/dbscan/</link>
+      <pubDate>Sat, 09 Mar 2024 13:22:41 +0000</pubDate>
+      <guid>https://gufengjin770.github.io/post/dbscan/</guid>
+      <description>DBSCAN（Density-Based Spatial Clustering of Applications with Noise） 是一种基于密度的聚类算法，能够识别任意形状的簇，并能够有效地处理噪声数据。DBSCAN通过定义一定的密度阈值来识别簇，而不需要事先指定簇的数量。&#xA;DBSCAN的主要思想是根据数据点的密度来确定簇的边界。它的工作原理如下：&#xA;核心点（Core Points）：对于给定的密度参数ε（epsilon）和最小邻域内的点数目minPts，如果一个点的ε-邻域（包括该点在内的半径为ε的区域）内至少包含minPts个数据点，则这个点被称为核心点。&#xA;直接密度可达（Directly Density-Reachable）：如果一个点在另一个点的ε-邻域内，并且这个点是核心点，则这个点被认为是直接密度可达的。&#xA;密度可达（Density-Reachable）：如果存在一系列核心点，使得从第一个核心点到最后一个核心点经过的每个核心点都是直接密度可达的，则最后一个核心点是从第一个核心点密度可达的。&#xA;密度相连（Density-Connected）：如果存在一个核心点C，使得点A和点B都是从核心点C密度可达的，则点A和点B被认为是密度相连的。&#xA;基于以上定义，DBSCAN算法将数据点分为三种类型：核心点、边界点和噪声点。核心点属于一个簇，边界点位于某个簇的边界上，而噪声点不属于任何簇。&#xA;DBSCAN的优点包括对噪声和离群点的鲁棒性、能够发现任意形状的簇、不需要事先指定簇的数量等。但是，DBSCAN的性能受到密度参数ε和最小邻域内的点数目minPts的选择影响较大，需要调参来获得最佳结果。&#xA;import numpy as np def euclidean_distance(x1, x2): return np.sqrt(np.sum((x1 - x2)**2)) def range_query(data, point_index, eps): neighbors = [] for i in range(len(data)): if euclidean_distance(data[point_index], data[i]) &amp;lt;= eps: neighbors.append(i) return neighbors def dbscan(data, eps, min_samples): labels = np.full(len(data), -1) # -1表示噪声点 cluster_id = 0 for i in range(len(data)): if labels[i] != -1: continue neighbors = range_query(data, i, eps) if len(neighbors) &amp;lt; min_samples: labels[i] = -1 # 标记为噪声点 else: cluster_id += 1 labels[i] = cluster_id expand_cluster(data, labels, i, neighbors, cluster_id, eps, min_samples) cluster = { f&amp;#34;group{i}&amp;#34; : [] for i in set(labels)} for i in range(len(data)): cluster[f&amp;#34;group{labels[i]}&amp;#34;].</description>
+    </item>
     <item>
       <title>Kmeans</title>
       <link>https://gufengjin770.github.io/post/kmeans/</link>
