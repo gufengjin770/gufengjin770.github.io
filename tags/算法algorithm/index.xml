@@ -6,8 +6,15 @@
     <description>Recent content in 算法algorithm on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 05 Apr 2024 23:58:23 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 06 Apr 2024 00:11:49 +0100</lastBuildDate>
     <atom:link href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CNN-MINST</title>
+      <link>https://gufengjin770.github.io/post/cnn-minst/</link>
+      <pubDate>Sat, 06 Apr 2024 00:11:49 +0100</pubDate>
+      <guid>https://gufengjin770.github.io/post/cnn-minst/</guid>
+      <description># This Python 3 environment comes with many helpful analytics libraries installed # It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python # For example, here&amp;#39;s several helpful packages to load import numpy as np # linear algebra import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv) # Input data files are available in the read-only &amp;#34;../input/&amp;#34; directory # For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory import os for dirname, _, filenames in os.</description>
+    </item>
     <item>
       <title>Seq to Seq</title>
       <link>https://gufengjin770.github.io/post/seq-to-seq/</link>

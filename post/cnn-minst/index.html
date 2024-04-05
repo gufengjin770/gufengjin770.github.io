@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    
+    <title>CNN-MINST // 金谷风的博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.123.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Gufeng Jin" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="CNN-MINST"/>
+<meta name="twitter:description" content="# This Python 3 environment comes with many helpful analytics libraries installed # It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python # For example, here&#39;s several helpful packages to load import numpy as np # linear algebra import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv) # Input data files are available in the read-only &#34;../input/&#34; directory # For example, running this (by clicking run or pressing Shift&#43;Enter) will list all files under the input directory import os for dirname, _, filenames in os."/>
+
+    <meta property="og:title" content="CNN-MINST" />
+<meta property="og:description" content="# This Python 3 environment comes with many helpful analytics libraries installed # It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python # For example, here&#39;s several helpful packages to load import numpy as np # linear algebra import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv) # Input data files are available in the read-only &#34;../input/&#34; directory # For example, running this (by clicking run or pressing Shift&#43;Enter) will list all files under the input directory import os for dirname, _, filenames in os." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gufengjin770.github.io/post/cnn-minst/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-06T00:11:49+01:00" />
+<meta property="article:modified_time" content="2024-04-06T00:11:49+01:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <span class="app-header-title">金谷风的博客</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>兢兢以强</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/gufengjin770" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="mailto:gufengjin770@gmail.com" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>E-mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">CNN-MINST</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Apr 6, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          5 min read
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
+  <title>tag</title>
+  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+</svg>
+              <a class="tag" href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/">算法algorithm</a>
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># This Python 3 environment comes with many helpful analytics libraries installed</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For example, here&#39;s several helpful packages to load</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np <span style="color:#75715e"># linear algebra</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd <span style="color:#75715e"># data processing, CSV file I/O (e.g. pd.read_csv)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Input data files are available in the read-only &#34;../input/&#34; directory</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> dirname, _, filenames <span style="color:#f92672">in</span> os<span style="color:#f92672">.</span>walk(<span style="color:#e6db74">&#39;/kaggle/input&#39;</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> filename <span style="color:#f92672">in</span> filenames:
+</span></span><span style="display:flex;"><span>        print(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(dirname, filename))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using &#34;Save &amp; Run All&#34; </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You can also write temporary files to /kaggle/temp/, but they won&#39;t be saved outside of the current session</span>
+</span></span></code></pre></div><pre><code>/kaggle/input/model1/model.pth
+/kaggle/input/digit-recognizer/sample_submission.csv
+/kaggle/input/digit-recognizer/train.csv
+/kaggle/input/digit-recognizer/test.csv
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Import necessary packages.</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn <span style="color:#66d9ef">as</span> nn
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.optim <span style="color:#66d9ef">as</span> optim
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn.functional <span style="color:#66d9ef">as</span> F
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> Dataset, DataLoader, Subset, random_split
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.optim.lr_scheduler <span style="color:#f92672">import</span> ReduceLROnPlateau
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torchvision.transforms <span style="color:#66d9ef">as</span> transforms
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#34;/kaggle/input/digit-recognizer/train.csv&#34;</span>)
+</span></span><span style="display:flex;"><span>train_df<span style="color:#f92672">.</span>head()
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>device <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>device(<span style="color:#e6db74">&#34;cuda&#34;</span> <span style="color:#66d9ef">if</span> torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>is_available() <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;cpu&#34;</span>)
+</span></span><span style="display:flex;"><span>print(device)
+</span></span></code></pre></div><pre><code>cuda
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">reshape_pixels</span>(data):
+</span></span><span style="display:flex;"><span>    pixels <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>iloc[:, <span style="color:#ae81ff">1</span>:]<span style="color:#f92672">.</span>values<span style="color:#f92672">.</span>reshape(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> pixels
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>images <span style="color:#f92672">=</span> reshape_pixels(train_df)
+</span></span><span style="display:flex;"><span>labels <span style="color:#f92672">=</span> train_df[<span style="color:#e6db74">&#34;label&#34;</span>]<span style="color:#f92672">.</span>to_numpy()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>torch_tensors <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(images, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>float32)<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>y_np <span style="color:#f92672">=</span> [[int(i <span style="color:#f92672">==</span> label) <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">10</span>)] <span style="color:#66d9ef">for</span> label <span style="color:#f92672">in</span> labels]
+</span></span><span style="display:flex;"><span>y_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(y_np, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>float32)<span style="color:#f92672">.</span>to(device)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>imshow(torch_tensors[<span style="color:#ae81ff">10</span>]<span style="color:#f92672">.</span>squeeze()<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy())
+</span></span></code></pre></div><pre><code>&lt;matplotlib.image.AxesImage at 0x7d8cf87eeb90&gt;
+</code></pre>
+<p><img src="CNN-MINST_files/CNN-MINST_5_1.png" alt="png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>torch_tensors <span style="color:#f92672">=</span> torch_tensors <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Define a custom Dataset class</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomDataset</span>(Dataset):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, X, y, transform<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>X <span style="color:#f92672">=</span> X
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>y <span style="color:#f92672">=</span> y
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>transform <span style="color:#f92672">=</span> transform
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __len__(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> len(self<span style="color:#f92672">.</span>X)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __getitem__(self, idx):
+</span></span><span style="display:flex;"><span>        image <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>X[idx]
+</span></span><span style="display:flex;"><span>        label <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>y[idx]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>transform:
+</span></span><span style="display:flex;"><span>            image <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>transform(image)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> image, label
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define transformations for augmentation</span>
+</span></span><span style="display:flex;"><span>transform <span style="color:#f92672">=</span> transforms<span style="color:#f92672">.</span>Compose([
+</span></span><span style="display:flex;"><span>transforms<span style="color:#f92672">.</span>RandomRotation(degrees<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>),  <span style="color:#75715e"># Random rotation within the range [-10, 10] degrees</span>
+</span></span><span style="display:flex;"><span>transforms<span style="color:#f92672">.</span>RandomAffine(degrees<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, translate<span style="color:#f92672">=</span>(<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">0.1</span>)),  <span style="color:#75715e"># Random translation</span>
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create an instance of the custom Dataset class</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> CustomDataset(torch_tensors, y_tensor, transform<span style="color:#f92672">=</span>transform)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a DataLoader object</span>
+</span></span><span style="display:flex;"><span>batch_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Define the size of the validation set</span>
+</span></span><span style="display:flex;"><span>val_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>  <span style="color:#75715e"># 20% of the dataset will be used for validation</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Calculate the number of samples for training and validation</span>
+</span></span><span style="display:flex;"><span>num_samples <span style="color:#f92672">=</span> len(dataset)
+</span></span><span style="display:flex;"><span>num_val_samples <span style="color:#f92672">=</span> int(val_size <span style="color:#f92672">*</span> num_samples)
+</span></span><span style="display:flex;"><span>num_train_samples <span style="color:#f92672">=</span> num_samples <span style="color:#f92672">-</span> num_val_samples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use random_split to split the dataset into training and validation sets</span>
+</span></span><span style="display:flex;"><span>train_dataset, val_dataset <span style="color:#f92672">=</span> random_split(dataset, [num_train_samples, num_val_samples])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Now, create DataLoader objects for training and validation sets</span>
+</span></span><span style="display:flex;"><span>train_loader <span style="color:#f92672">=</span> DataLoader(train_dataset, batch_size<span style="color:#f92672">=</span>batch_size, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>val_loader <span style="color:#f92672">=</span> DataLoader(val_dataset, batch_size<span style="color:#f92672">=</span>batch_size, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> batch <span style="color:#f92672">in</span> train_loader:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Get the shape of the input data tensor</span>
+</span></span><span style="display:flex;"><span>    input_data_shape <span style="color:#f92672">=</span> batch[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>shape  <span style="color:#75715e"># Assuming input data is at index 0 in the batch</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print the shape of the input data</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Shape of input data:&#34;</span>, input_data_shape)
+</span></span></code></pre></div><pre><code>Shape of input data: torch.Size([32, 1, 28, 28])
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CNN</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
+</span></span><span style="display:flex;"><span>        super(CNN, self)<span style="color:#f92672">.</span>__init__()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># First convolutional layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>conv1 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Conv2d(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">32</span>, kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, padding<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>  )
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Second convolutional layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>conv2 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Conv2d(<span style="color:#ae81ff">32</span>, <span style="color:#ae81ff">32</span>, kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, padding<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>,stride <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Max pooling layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>maxpool1 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>MaxPool2d(kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, stride<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Dropout layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout1 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dropout2d(p<span style="color:#f92672">=</span><span style="color:#ae81ff">0.25</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Third convolutional layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>conv3 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Conv2d(<span style="color:#ae81ff">32</span>, <span style="color:#ae81ff">64</span>, kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>, padding<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Fourth convolutional layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>conv4 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Conv2d(<span style="color:#ae81ff">64</span>, <span style="color:#ae81ff">64</span>, kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>, padding<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Max pooling layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>maxpool2 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>MaxPool2d(kernel_size<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, stride<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Dropout layer</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout2 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dropout2d(p<span style="color:#f92672">=</span><span style="color:#ae81ff">0.25</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Fully connected layers</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>fc1 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(<span style="color:#ae81ff">64</span><span style="color:#f92672">*</span><span style="color:#ae81ff">7</span><span style="color:#f92672">*</span><span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">256</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout3 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dropout(p<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>fc2 <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(<span style="color:#ae81ff">256</span>, <span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, x):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the first convolutional layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>relu(self<span style="color:#f92672">.</span>conv1(x))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the second convolutional layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>relu(self<span style="color:#f92672">.</span>conv2(x))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Max pooling</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>maxpool1(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Dropout</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>dropout1(x)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the third convolutional layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>relu(self<span style="color:#f92672">.</span>conv3(x))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the fourth convolutional layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>relu(self<span style="color:#f92672">.</span>conv4(x))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Max pooling</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>maxpool2(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Dropout</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>dropout2(x)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Flatten the output for the fully connected layers</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> x<span style="color:#f92672">.</span>view(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">64</span><span style="color:#f92672">*</span><span style="color:#ae81ff">7</span><span style="color:#f92672">*</span><span style="color:#ae81ff">7</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the first fully connected layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>relu(self<span style="color:#f92672">.</span>fc1(x))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Dropout</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>dropout3(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Forward pass through the second fully connected layer</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>fc2(x)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> F<span style="color:#f92672">.</span>log_softmax(x, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create an instance of the CNN model</span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> CNN()<span style="color:#f92672">.</span>to(device)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Define loss function and optimizer</span>
+</span></span><span style="display:flex;"><span>criterion <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>CrossEntropyLoss()
+</span></span><span style="display:flex;"><span>optimizer <span style="color:#f92672">=</span> optim<span style="color:#f92672">.</span>SGD(model<span style="color:#f92672">.</span>parameters(), lr<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>, momentum<span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>)
+</span></span><span style="display:flex;"><span>scheduler <span style="color:#f92672">=</span> ReduceLROnPlateau(optimizer, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;max&#39;</span>, factor<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>, patience<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, verbose<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, min_lr<span style="color:#f92672">=</span><span style="color:#ae81ff">0.00001</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">accuracy</span>(y_pred, y_true):
+</span></span><span style="display:flex;"><span>    predicted <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(y_pred,dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    true_indices <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(y_true,dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    correct <span style="color:#f92672">=</span> (predicted <span style="color:#f92672">==</span> true_indices)<span style="color:#f92672">.</span>sum()<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> correct <span style="color:#f92672">/</span> len(predicted)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>epochs <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+</span></span><span style="display:flex;"><span>best_val_accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>patience <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>  <span style="color:#75715e"># Number of epochs to wait if validation accuracy doesn&#39;t improve</span>
+</span></span><span style="display:flex;"><span>counter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>  <span style="color:#75715e"># Counter to track patience</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> epoch <span style="color:#f92672">in</span> range(epochs):
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>train()
+</span></span><span style="display:flex;"><span>    train_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    train_accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> batch_idx, (data, target) <span style="color:#f92672">in</span> enumerate(train_loader):
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>zero_grad()
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> model(data)
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> criterion(output, target)
+</span></span><span style="display:flex;"><span>        loss<span style="color:#f92672">.</span>backward()
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>step()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        train_loss <span style="color:#f92672">+=</span> loss<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>        train_accuracy <span style="color:#f92672">+=</span> accuracy(output, target)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    train_loss <span style="color:#f92672">/=</span> len(train_loader)
+</span></span><span style="display:flex;"><span>    train_accuracy <span style="color:#f92672">/=</span> len(train_loader)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Validation</span>
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>eval()
+</span></span><span style="display:flex;"><span>    val_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    val_accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> data, target <span style="color:#f92672">in</span> val_loader:
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> model(data)
+</span></span><span style="display:flex;"><span>            loss <span style="color:#f92672">=</span> criterion(output, target)
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            val_loss <span style="color:#f92672">+=</span> loss<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>            val_accuracy <span style="color:#f92672">+=</span> accuracy(output, target)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    val_loss <span style="color:#f92672">/=</span> len(val_loader)
+</span></span><span style="display:flex;"><span>    val_accuracy <span style="color:#f92672">/=</span> len(val_loader)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Epoch </span><span style="color:#e6db74">{</span>epoch<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>epochs<span style="color:#e6db74">}</span><span style="color:#e6db74">, Train Loss: </span><span style="color:#e6db74">{</span>train_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">, </span><span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span><span style="color:#e6db74">    Train Accuracy: </span><span style="color:#e6db74">{</span>train_accuracy<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">, Val Loss: </span><span style="color:#e6db74">{</span>val_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">, Val Accuracy: </span><span style="color:#e6db74">{</span>val_accuracy<span style="color:#e6db74">:</span><span style="color:#e6db74">.4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Check if validation accuracy has improved</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> val_accuracy <span style="color:#f92672">&gt;</span> best_val_accuracy:
+</span></span><span style="display:flex;"><span>        best_val_accuracy <span style="color:#f92672">=</span> val_accuracy
+</span></span><span style="display:flex;"><span>        counter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>  <span style="color:#75715e"># Reset counter if validation accuracy improves</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        counter <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e"># Increment counter if validation accuracy doesn&#39;t improve</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> counter <span style="color:#f92672">&gt;=</span> patience:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Early stopping after epoch </span><span style="color:#e6db74">{</span>epoch<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> as validation accuracy did not improve.&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    scheduler<span style="color:#f92672">.</span>step(val_accuracy)
+</span></span></code></pre></div><pre><code>Epoch 1/50, Train Loss: 0.1013,     Train Accuracy: 0.9709, Val Loss: 0.0585, Val Accuracy: 0.9810
+Epoch 2/50, Train Loss: 0.0910,     Train Accuracy: 0.9722, Val Loss: 0.0518, Val Accuracy: 0.9849
+Epoch 3/50, Train Loss: 0.0855,     Train Accuracy: 0.9746, Val Loss: 0.0561, Val Accuracy: 0.9821
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>torch<span style="color:#f92672">.</span>save(model, <span style="color:#e6db74">&#39;/kaggle/working/model.pth&#39;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>test_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#34;/kaggle/input/digit-recognizer/test.csv&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>test_image <span style="color:#f92672">=</span> test_df<span style="color:#f92672">.</span>values<span style="color:#f92672">.</span>reshape(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)
+</span></span><span style="display:flex;"><span>torch_tensors <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(test_image, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>float32)<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>torch_tensors <span style="color:#f92672">=</span> torch_tensors <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model<span style="color:#f92672">.</span>eval()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Disable gradient calculation to speed up inference</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Forward pass: compute predicted outputs by passing inputs to the model</span>
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> model(torch_tensors)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If you want to obtain class labels from the predictions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You can use argmax to get the index of the maximum value along the specified dimension</span>
+</span></span><span style="display:flex;"><span>predicted_classes <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(predictions, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Convert the tensors to numpy arrays if needed</span>
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> predicted_classes<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>Series(results,name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Label&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>submission <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat([pd<span style="color:#f92672">.</span>Series(range(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">28001</span>),name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ImageId&#34;</span>),results],axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>submission<span style="color:#f92672">.</span>to_csv(<span style="color:#e6db74">&#34;/kaggle/working/cnn_mnist_datagen.csv&#34;</span>,index<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>print(submission)
+</span></span></code></pre></div>
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
