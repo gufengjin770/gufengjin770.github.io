@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    
+    <title>Seq to Seq // 金谷风的博客</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.123.3">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Gufeng Jin" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Seq to Seq"/>
+<meta name="twitter:description" content="import pandas as pd import re import numpy as np import spacy import datasets import torchtext import tqdm import evaluate from datasets import Dataset, DatasetDict import random from typing import Tuple import torch import torch.nn as nn import torch.optim as optim import torch.nn.functional as F from torch import Tensor c:\Users\gufen\AppData\Local\Programs\Python\Python311\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html from .autonotebook import tqdm as notebook_tqdm file_path = &#39;G:\\ted2020.tsv&#39; column_data = pd."/>
+
+    <meta property="og:title" content="Seq to Seq" />
+<meta property="og:description" content="import pandas as pd import re import numpy as np import spacy import datasets import torchtext import tqdm import evaluate from datasets import Dataset, DatasetDict import random from typing import Tuple import torch import torch.nn as nn import torch.optim as optim import torch.nn.functional as F from torch import Tensor c:\Users\gufen\AppData\Local\Programs\Python\Python311\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html from .autonotebook import tqdm as notebook_tqdm file_path = &#39;G:\\ted2020.tsv&#39; column_data = pd." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gufengjin770.github.io/post/seq-to-seq/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-05T23:58:23+01:00" />
+<meta property="article:modified_time" content="2024-04-05T23:58:23+01:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://gufengjin770.github.io/"><img class="app-header-avatar" src="/image1.jpg" alt="Gufeng Jin" /></a>
+      <span class="app-header-title">金谷风的博客</span>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>兢兢以强</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/gufengjin770" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="mailto:gufengjin770@gmail.com" target="_blank" rel="noreferrer noopener me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>E-mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">Seq to Seq</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Apr 5, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          12 min read
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tag">
+  <title>tag</title>
+  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+</svg>
+              <a class="tag" href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/">算法algorithm</a>
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> re
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> spacy
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> datasets
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torchtext
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tqdm
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> evaluate
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> Dataset, DatasetDict
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Tuple
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn <span style="color:#66d9ef">as</span> nn
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.optim <span style="color:#66d9ef">as</span> optim
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn.functional <span style="color:#66d9ef">as</span> F
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch <span style="color:#f92672">import</span> Tensor
+</span></span></code></pre></div><pre><code>c:\Users\gufen\AppData\Local\Programs\Python\Python311\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>file_path <span style="color:#f92672">=</span>  <span style="color:#e6db74">&#39;G:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">ted2020.tsv&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>column_data <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(file_path, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">&#39;</span>, usecols<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;en&#34;</span>,<span style="color:#e6db74">&#34;zh-cn&#34;</span>],encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># del NaN</span>
+</span></span><span style="display:flex;"><span>column_data <span style="color:#f92672">=</span> column_data<span style="color:#f92672">.</span>dropna()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">strQ2B</span>(ustring):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 參考來源:https://ithelp.ithome.com.tw/articles/10233122</span>
+</span></span><span style="display:flex;"><span>    ss <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> s <span style="color:#f92672">in</span> ustring:
+</span></span><span style="display:flex;"><span>        rstring <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> uchar <span style="color:#f92672">in</span> s:
+</span></span><span style="display:flex;"><span>            inside_code <span style="color:#f92672">=</span> ord(uchar)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> inside_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">12288</span>:
+</span></span><span style="display:flex;"><span>                inside_code <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> (inside_code <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">65281</span> <span style="color:#f92672">and</span> inside_code <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">65374</span>):
+</span></span><span style="display:flex;"><span>                inside_code <span style="color:#f92672">-=</span> <span style="color:#ae81ff">65248</span>
+</span></span><span style="display:flex;"><span>            rstring <span style="color:#f92672">+=</span> chr(inside_code)
+</span></span><span style="display:flex;"><span>        ss<span style="color:#f92672">.</span>append(rstring)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join(ss)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">clean_s</span>(s, lang):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> lang <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;en&#39;</span>:
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>sub(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;\([^()]*\)&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, s) <span style="color:#75715e"># remove ([text])</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#75715e"># remove &#39;-&#39;</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>sub(<span style="color:#e6db74">&#39;([.,;!?()</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">])&#39;</span>, <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39; \1 &#39;</span>, s) <span style="color:#75715e"># keep punctuation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> lang <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;zh&#39;</span>:
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> strQ2B(s) <span style="color:#75715e"># Q2B</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>sub(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;\([^()]*\)&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, s) <span style="color:#75715e"># remove ([text])</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;—&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;“&#39;</span>, <span style="color:#e6db74">&#39;&#34;&#39;</span>)
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;”&#39;</span>, <span style="color:#e6db74">&#39;&#34;&#39;</span>)
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;_&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>sub(<span style="color:#e6db74">&#39;([。,;!?()</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">~「」])&#39;</span>, <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39; \1 &#39;</span>, s) <span style="color:#75715e"># keep punctuation</span>
+</span></span><span style="display:flex;"><span>    s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39; &#39;</span><span style="color:#f92672">.</span>join(s<span style="color:#f92672">.</span>strip()<span style="color:#f92672">.</span>split())
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>column_data[<span style="color:#e6db74">&#39;en&#39;</span>] <span style="color:#f92672">=</span> column_data[<span style="color:#e6db74">&#39;en&#39;</span>]<span style="color:#f92672">.</span>apply(clean_s,lang <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;en&#39;</span>)
+</span></span><span style="display:flex;"><span>column_data[<span style="color:#e6db74">&#39;zh-cn&#39;</span>] <span style="color:#f92672">=</span> column_data[<span style="color:#e6db74">&#39;zh-cn&#39;</span>]<span style="color:#f92672">.</span>apply(clean_s,lang <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;zh&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Calculate length of data</span>
+</span></span><span style="display:flex;"><span>length <span style="color:#f92672">=</span> len(column_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Split data into train, validation, and test sets</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># train_data = column_data[:int(length*0.1)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># valid_data = column_data[int(length*0.1):int(length*0.12)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># test_data = column_data[int(length*0.12):int(length*0.15)]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> column_data[:<span style="color:#ae81ff">3000</span>]
+</span></span><span style="display:flex;"><span>valid_data <span style="color:#f92672">=</span> column_data[<span style="color:#ae81ff">3000</span>:<span style="color:#ae81ff">4200</span>]
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> column_data[<span style="color:#ae81ff">4200</span>:<span style="color:#ae81ff">5000</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a DatasetDict object</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> DatasetDict({
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;train&#39;</span>: Dataset<span style="color:#f92672">.</span>from_pandas(train_data),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;validation&#39;</span>: Dataset<span style="color:#f92672">.</span>from_pandas(valid_data),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;test&#39;</span>: Dataset<span style="color:#f92672">.</span>from_pandas(test_data)
+</span></span><span style="display:flex;"><span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print the structure</span>
+</span></span><span style="display:flex;"><span>print(dataset)
+</span></span></code></pre></div><pre><code>DatasetDict({
+    train: Dataset({
+        features: ['en', 'zh-cn', '__index_level_0__'],
+        num_rows: 3000
+    })
+    validation: Dataset({
+        features: ['en', 'zh-cn', '__index_level_0__'],
+        num_rows: 1200
+    })
+    test: Dataset({
+        features: ['en', 'zh-cn', '__index_level_0__'],
+        num_rows: 800
+    })
+})
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>remove_columns(<span style="color:#e6db74">&#39;__index_level_0__&#39;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_data, valid_data, test_data <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>    dataset[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    dataset[<span style="color:#e6db74">&#34;validation&#34;</span>],
+</span></span><span style="display:flex;"><span>    dataset[<span style="color:#e6db74">&#34;test&#34;</span>],
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data[<span style="color:#ae81ff">100</span>]
+</span></span></code></pre></div><pre><code>{'en': &quot;Once it becomes a closed system , with U . S . participation , then everybody who's on a board of directors how many people here serve on the board of directors of a corporation ?&quot;,
+ 'zh-cn': '但是一旦它变成了封闭的体系 , 不管美国是否参与 , 那样的话每个人都成为董事会成员了--这里有多少人是公司里面的董事会成员呢 ?'}
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>en_nlp <span style="color:#f92672">=</span> spacy<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;en_core_web_sm&#34;</span>)
+</span></span><span style="display:flex;"><span>zh_nlp <span style="color:#f92672">=</span> spacy<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;zh_core_web_sm&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">tokenize_example</span>(example, en_nlp, zh_nlp, max_length, lower, sos_token, eos_token):
+</span></span><span style="display:flex;"><span>    en_tokens <span style="color:#f92672">=</span> [token<span style="color:#f92672">.</span>text <span style="color:#66d9ef">for</span> token <span style="color:#f92672">in</span> en_nlp<span style="color:#f92672">.</span>tokenizer(example[<span style="color:#e6db74">&#34;en&#34;</span>])][:max_length]
+</span></span><span style="display:flex;"><span>    zh_tokens <span style="color:#f92672">=</span> [token<span style="color:#f92672">.</span>text <span style="color:#66d9ef">for</span> token <span style="color:#f92672">in</span> zh_nlp<span style="color:#f92672">.</span>tokenizer(example[<span style="color:#e6db74">&#34;zh-cn&#34;</span>])][:max_length]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> lower:
+</span></span><span style="display:flex;"><span>        en_tokens <span style="color:#f92672">=</span> [token<span style="color:#f92672">.</span>lower() <span style="color:#66d9ef">for</span> token <span style="color:#f92672">in</span> en_tokens]
+</span></span><span style="display:flex;"><span>    en_tokens <span style="color:#f92672">=</span> [sos_token] <span style="color:#f92672">+</span> en_tokens <span style="color:#f92672">+</span> [eos_token]
+</span></span><span style="display:flex;"><span>    zh_tokens <span style="color:#f92672">=</span> [sos_token] <span style="color:#f92672">+</span> zh_tokens <span style="color:#f92672">+</span> [eos_token]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;en_tokens&#34;</span>: en_tokens, <span style="color:#e6db74">&#34;zh_tokens&#34;</span>: zh_tokens}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>max_length <span style="color:#f92672">=</span> <span style="color:#ae81ff">1_000</span>
+</span></span><span style="display:flex;"><span>lower <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>sos_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;sos&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>eos_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;eos&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fn_kwargs <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;en_nlp&#34;</span>: en_nlp,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;zh_nlp&#34;</span>: zh_nlp,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;max_length&#34;</span>: max_length,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;lower&#34;</span>: lower,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;sos_token&#34;</span>: sos_token,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;eos_token&#34;</span>: eos_token,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> train_data<span style="color:#f92672">.</span>map(tokenize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span><span style="display:flex;"><span>valid_data <span style="color:#f92672">=</span> valid_data<span style="color:#f92672">.</span>map(tokenize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> test_data<span style="color:#f92672">.</span>map(tokenize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span></code></pre></div><pre><code>Map: 100%|██████████| 3000/3000 [00:02&lt;00:00, 1276.19 examples/s]
+Map: 100%|██████████| 1200/1200 [00:00&lt;00:00, 1560.49 examples/s]
+Map: 100%|██████████| 800/800 [00:00&lt;00:00, 1440.24 examples/s]
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_data[<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><pre><code>{'en': 'Thank you so much , Chris .',
+ 'zh-cn': '非常谢谢 , 克里斯 。 的确非常荣幸',
+ 'en_tokens': ['&lt;sos&gt;',
+  'thank',
+  'you',
+  'so',
+  'much',
+  ',',
+  'chris',
+  '.',
+  '&lt;eos&gt;'],
+ 'zh_tokens': ['&lt;sos&gt;',
+  '非常',
+  '谢谢',
+  ',',
+  '克里斯',
+  '。',
+  '的确',
+  '非常',
+  '荣幸',
+  '&lt;eos&gt;']}
+</code></pre>
+<p>这段代码使用了 PyTorch 的 torchtext.vocab.build_vocab_from_iterator() 函数来构建词汇表（vocabulary）。</p>
+<p>min_freq = 2：指定了词汇表中单词的最小出现频率。只有出现频率大于等于 min_freq 的单词才会被包含在词汇表中，频率低于该值的单词将被视为未知单词（unknown）或被省略。</p>
+<p>unk_token = &ldquo;<!-- raw HTML omitted -->&rdquo; 和 pad_token = &ldquo;<!-- raw HTML omitted -->&quot;：分别指定了未知单词（unknown token）和填充单词（padding token）。这些是特殊的标记，用于表示在模型中未见过的单词或者用于填充句子到相同长度。</p>
+<p>special_tokens：包含了所有特殊标记的列表。在这个例子中，除了未知单词和填充单词之外，还可能包括起始标记（start of sequence）和结束标记（end of sequence）等特殊标记。</p>
+<p>torchtext.vocab.build_vocab_from_iterator() 函数接受一个迭代器作为输入，该迭代器包含了所有句子的标记序列（token sequence）。然后，它会根据这些标记序列构建词汇表。参数 specials 用于指定特殊标记，min_freq 用于指定最小频率。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>min_freq <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>unk_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;unk&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>pad_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;pad&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>special_tokens <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    unk_token,
+</span></span><span style="display:flex;"><span>    pad_token,
+</span></span><span style="display:flex;"><span>    sos_token,
+</span></span><span style="display:flex;"><span>    eos_token,
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>en_vocab <span style="color:#f92672">=</span> torchtext<span style="color:#f92672">.</span>vocab<span style="color:#f92672">.</span>build_vocab_from_iterator(
+</span></span><span style="display:flex;"><span>    train_data[<span style="color:#e6db74">&#34;en_tokens&#34;</span>],
+</span></span><span style="display:flex;"><span>    min_freq<span style="color:#f92672">=</span>min_freq,
+</span></span><span style="display:flex;"><span>    specials<span style="color:#f92672">=</span>special_tokens,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>zh_vocab <span style="color:#f92672">=</span> torchtext<span style="color:#f92672">.</span>vocab<span style="color:#f92672">.</span>build_vocab_from_iterator(
+</span></span><span style="display:flex;"><span>    train_data[<span style="color:#e6db74">&#34;zh_tokens&#34;</span>],
+</span></span><span style="display:flex;"><span>    min_freq<span style="color:#f92672">=</span>min_freq,
+</span></span><span style="display:flex;"><span>    specials<span style="color:#f92672">=</span>special_tokens,
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>len(en_vocab), len(zh_vocab)
+</span></span></code></pre></div><pre><code>(2104, 2304)
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> en_vocab[unk_token] <span style="color:#f92672">==</span> zh_vocab[unk_token]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> en_vocab[pad_token] <span style="color:#f92672">==</span> zh_vocab[pad_token]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>unk_index <span style="color:#f92672">=</span> en_vocab[unk_token]
+</span></span><span style="display:flex;"><span>pad_index <span style="color:#f92672">=</span> en_vocab[pad_token]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>en_vocab<span style="color:#f92672">.</span>set_default_index(unk_index)
+</span></span><span style="display:flex;"><span>zh_vocab<span style="color:#f92672">.</span>set_default_index(unk_index)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">numericalize_example</span>(example, en_vocab, zh_vocab):
+</span></span><span style="display:flex;"><span>    en_ids <span style="color:#f92672">=</span> en_vocab<span style="color:#f92672">.</span>lookup_indices(example[<span style="color:#e6db74">&#34;en_tokens&#34;</span>])
+</span></span><span style="display:flex;"><span>    zh_ids <span style="color:#f92672">=</span> zh_vocab<span style="color:#f92672">.</span>lookup_indices(example[<span style="color:#e6db74">&#34;zh_tokens&#34;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;en_ids&#34;</span>: en_ids, <span style="color:#e6db74">&#34;zh_ids&#34;</span>: zh_ids}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>fn_kwargs <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;en_vocab&#34;</span>: en_vocab, <span style="color:#e6db74">&#34;zh_vocab&#34;</span>: zh_vocab}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> train_data<span style="color:#f92672">.</span>map(numericalize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span><span style="display:flex;"><span>valid_data <span style="color:#f92672">=</span> valid_data<span style="color:#f92672">.</span>map(numericalize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> test_data<span style="color:#f92672">.</span>map(numericalize_example, fn_kwargs<span style="color:#f92672">=</span>fn_kwargs)
+</span></span></code></pre></div><pre><code>Map: 100%|██████████| 3000/3000 [00:00&lt;00:00, 7971.94 examples/s]
+Map: 100%|██████████| 1200/1200 [00:00&lt;00:00, 9145.64 examples/s]
+Map: 100%|██████████| 800/800 [00:00&lt;00:00, 8992.60 examples/s]
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_data[<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><pre><code>{'en': 'Thank you so much , Chris .',
+ 'zh-cn': '非常谢谢 , 克里斯 。 的确非常荣幸',
+ 'en_tokens': ['&lt;sos&gt;',
+  'thank',
+  'you',
+  'so',
+  'much',
+  ',',
+  'chris',
+  '.',
+  '&lt;eos&gt;'],
+ 'zh_tokens': ['&lt;sos&gt;',
+  '非常',
+  '谢谢',
+  ',',
+  '克里斯',
+  '。',
+  '的确',
+  '非常',
+  '荣幸',
+  '&lt;eos&gt;'],
+ 'en_ids': [2, 216, 14, 20, 113, 4, 0, 5, 3],
+ 'zh_ids': [2, 69, 298, 5, 0, 6, 779, 69, 0, 3]}
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>en_vocab<span style="color:#f92672">.</span>lookup_tokens(train_data[<span style="color:#ae81ff">0</span>][<span style="color:#e6db74">&#34;en_ids&#34;</span>])
+</span></span></code></pre></div><pre><code>['&lt;sos&gt;', 'thank', 'you', 'so', 'much', ',', '&lt;unk&gt;', '.', '&lt;eos&gt;']
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>data_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;torch&#34;</span>
+</span></span><span style="display:flex;"><span>format_columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;en_ids&#34;</span>, <span style="color:#e6db74">&#34;zh_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data <span style="color:#f92672">=</span> train_data<span style="color:#f92672">.</span>with_format(
+</span></span><span style="display:flex;"><span>    type<span style="color:#f92672">=</span>data_type, columns<span style="color:#f92672">=</span>format_columns, output_all_columns<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>valid_data <span style="color:#f92672">=</span> valid_data<span style="color:#f92672">.</span>with_format(
+</span></span><span style="display:flex;"><span>    type<span style="color:#f92672">=</span>data_type,
+</span></span><span style="display:flex;"><span>    columns<span style="color:#f92672">=</span>format_columns,
+</span></span><span style="display:flex;"><span>    output_all_columns<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>test_data <span style="color:#f92672">=</span> test_data<span style="color:#f92672">.</span>with_format(
+</span></span><span style="display:flex;"><span>    type<span style="color:#f92672">=</span>data_type,
+</span></span><span style="display:flex;"><span>    columns<span style="color:#f92672">=</span>format_columns,
+</span></span><span style="display:flex;"><span>    output_all_columns<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>train_data[<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><pre><code>{'en_ids': tensor([  2, 216,  14,  20, 113,   4,   0,   5,   3]),
+ 'zh_ids': tensor([  2,  69, 298,   5,   0,   6, 779,  69,   0,   3]),
+ 'en': 'Thank you so much , Chris .',
+ 'zh-cn': '非常谢谢 , 克里斯 。 的确非常荣幸',
+ 'en_tokens': ['&lt;sos&gt;',
+  'thank',
+  'you',
+  'so',
+  'much',
+  ',',
+  'chris',
+  '.',
+  '&lt;eos&gt;'],
+ 'zh_tokens': ['&lt;sos&gt;',
+  '非常',
+  '谢谢',
+  ',',
+  '克里斯',
+  '。',
+  '的确',
+  '非常',
+  '荣幸',
+  '&lt;eos&gt;']}
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_collate_fn</span>(pad_index):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">collate_fn</span>(batch):
+</span></span><span style="display:flex;"><span>        batch_en_ids <span style="color:#f92672">=</span> [example[<span style="color:#e6db74">&#34;en_ids&#34;</span>] <span style="color:#66d9ef">for</span> example <span style="color:#f92672">in</span> batch]
+</span></span><span style="display:flex;"><span>        batch_zh_ids <span style="color:#f92672">=</span> [example[<span style="color:#e6db74">&#34;zh_ids&#34;</span>] <span style="color:#66d9ef">for</span> example <span style="color:#f92672">in</span> batch]
+</span></span><span style="display:flex;"><span>        batch_en_ids <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>rnn<span style="color:#f92672">.</span>pad_sequence(batch_en_ids, padding_value<span style="color:#f92672">=</span>pad_index)
+</span></span><span style="display:flex;"><span>        batch_zh_ids <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>rnn<span style="color:#f92672">.</span>pad_sequence(batch_zh_ids, padding_value<span style="color:#f92672">=</span>pad_index)
+</span></span><span style="display:flex;"><span>        batch <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;en_ids&#34;</span>: batch_en_ids,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;zh_ids&#34;</span>: batch_zh_ids,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> batch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> collate_fn
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_data_loader</span>(dataset, batch_size, pad_index, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>):
+</span></span><span style="display:flex;"><span>    collate_fn <span style="color:#f92672">=</span> get_collate_fn(pad_index)
+</span></span><span style="display:flex;"><span>    data_loader <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>DataLoader(
+</span></span><span style="display:flex;"><span>        dataset<span style="color:#f92672">=</span>dataset,
+</span></span><span style="display:flex;"><span>        batch_size<span style="color:#f92672">=</span>batch_size,
+</span></span><span style="display:flex;"><span>        collate_fn<span style="color:#f92672">=</span>collate_fn,
+</span></span><span style="display:flex;"><span>        shuffle<span style="color:#f92672">=</span>shuffle,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> data_loader
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>batch_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_data_loader <span style="color:#f92672">=</span> get_data_loader(train_data, batch_size, pad_index, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>valid_data_loader <span style="color:#f92672">=</span> get_data_loader(valid_data, batch_size, pad_index)
+</span></span><span style="display:flex;"><span>test_data_loader <span style="color:#f92672">=</span> get_data_loader(test_data, batch_size, pad_index)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Encoder</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self,
+</span></span><span style="display:flex;"><span>                 input_dim: int,
+</span></span><span style="display:flex;"><span>                 emb_dim: int,
+</span></span><span style="display:flex;"><span>                 enc_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 dec_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 dropout: float):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span>__init__()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>input_dim <span style="color:#f92672">=</span> input_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>emb_dim <span style="color:#f92672">=</span> emb_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>enc_hid_dim <span style="color:#f92672">=</span> enc_hid_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dec_hid_dim <span style="color:#f92672">=</span> dec_hid_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout <span style="color:#f92672">=</span> dropout
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>embedding <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Embedding(input_dim, emb_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>rnn <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>GRU(emb_dim, enc_hid_dim, bidirectional <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>fc <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(enc_hid_dim <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>, dec_hid_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dropout(dropout)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self,
+</span></span><span style="display:flex;"><span>                src: Tensor) <span style="color:#f92672">-&gt;</span> Tuple[Tensor]:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        embedded <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>dropout(self<span style="color:#f92672">.</span>embedding(src))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        outputs, hidden <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>rnn(embedded)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        hidden <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tanh(self<span style="color:#f92672">.</span>fc(torch<span style="color:#f92672">.</span>cat((hidden[<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>,:,:], hidden[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,:,:]), dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> outputs, hidden
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Attention</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self,
+</span></span><span style="display:flex;"><span>                 enc_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 dec_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 attn_dim: int):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span>__init__()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>enc_hid_dim <span style="color:#f92672">=</span> enc_hid_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dec_hid_dim <span style="color:#f92672">=</span> dec_hid_dim
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>attn_in <span style="color:#f92672">=</span> (enc_hid_dim <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span> dec_hid_dim
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>attn <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(self<span style="color:#f92672">.</span>attn_in, attn_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self,
+</span></span><span style="display:flex;"><span>                decoder_hidden: Tensor,
+</span></span><span style="display:flex;"><span>                encoder_outputs: Tensor) <span style="color:#f92672">-&gt;</span> Tensor:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        src_len <span style="color:#f92672">=</span> encoder_outputs<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        repeated_decoder_hidden <span style="color:#f92672">=</span> decoder_hidden<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>repeat(<span style="color:#ae81ff">1</span>, src_len, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        encoder_outputs <span style="color:#f92672">=</span> encoder_outputs<span style="color:#f92672">.</span>permute(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        energy <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tanh(self<span style="color:#f92672">.</span>attn(torch<span style="color:#f92672">.</span>cat((
+</span></span><span style="display:flex;"><span>            repeated_decoder_hidden,
+</span></span><span style="display:flex;"><span>            encoder_outputs),
+</span></span><span style="display:flex;"><span>            dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        attention <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>sum(energy, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> F<span style="color:#f92672">.</span>softmax(attention, dim<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Decoder</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self,
+</span></span><span style="display:flex;"><span>                 output_dim: int,
+</span></span><span style="display:flex;"><span>                 emb_dim: int,
+</span></span><span style="display:flex;"><span>                 enc_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 dec_hid_dim: int,
+</span></span><span style="display:flex;"><span>                 dropout: int,
+</span></span><span style="display:flex;"><span>                 attention: nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span>__init__()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>emb_dim <span style="color:#f92672">=</span> emb_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>enc_hid_dim <span style="color:#f92672">=</span> enc_hid_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dec_hid_dim <span style="color:#f92672">=</span> dec_hid_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>output_dim <span style="color:#f92672">=</span> output_dim
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout <span style="color:#f92672">=</span> dropout
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>attention <span style="color:#f92672">=</span> attention
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>embedding <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Embedding(output_dim, emb_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>rnn <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>GRU((enc_hid_dim <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span> emb_dim, dec_hid_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>out <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Linear(self<span style="color:#f92672">.</span>attention<span style="color:#f92672">.</span>attn_in <span style="color:#f92672">+</span> emb_dim, output_dim)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dropout <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dropout(dropout)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_weighted_encoder_rep</span>(self,
+</span></span><span style="display:flex;"><span>                              decoder_hidden: Tensor,
+</span></span><span style="display:flex;"><span>                              encoder_outputs: Tensor) <span style="color:#f92672">-&gt;</span> Tensor:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>attention(decoder_hidden, encoder_outputs)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> a<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        encoder_outputs <span style="color:#f92672">=</span> encoder_outputs<span style="color:#f92672">.</span>permute(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        weighted_encoder_rep <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>bmm(a, encoder_outputs)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        weighted_encoder_rep <span style="color:#f92672">=</span> weighted_encoder_rep<span style="color:#f92672">.</span>permute(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> weighted_encoder_rep
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self,
+</span></span><span style="display:flex;"><span>                input: Tensor,
+</span></span><span style="display:flex;"><span>                decoder_hidden: Tensor,
+</span></span><span style="display:flex;"><span>                encoder_outputs: Tensor) <span style="color:#f92672">-&gt;</span> Tuple[Tensor]:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        input <span style="color:#f92672">=</span> input<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        embedded <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>dropout(self<span style="color:#f92672">.</span>embedding(input))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        weighted_encoder_rep <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>_weighted_encoder_rep(decoder_hidden,
+</span></span><span style="display:flex;"><span>                                                          encoder_outputs)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        rnn_input <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>cat((embedded, weighted_encoder_rep), dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        output, decoder_hidden <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>rnn(rnn_input, decoder_hidden<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">0</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        embedded <span style="color:#f92672">=</span> embedded<span style="color:#f92672">.</span>squeeze(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> output<span style="color:#f92672">.</span>squeeze(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        weighted_encoder_rep <span style="color:#f92672">=</span> weighted_encoder_rep<span style="color:#f92672">.</span>squeeze(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>out(torch<span style="color:#f92672">.</span>cat((output,
+</span></span><span style="display:flex;"><span>                                     weighted_encoder_rep,
+</span></span><span style="display:flex;"><span>                                     embedded), dim <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> output, decoder_hidden<span style="color:#f92672">.</span>squeeze(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Seq2Seq</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self,
+</span></span><span style="display:flex;"><span>                 encoder: nn<span style="color:#f92672">.</span>Module,
+</span></span><span style="display:flex;"><span>                 decoder: nn<span style="color:#f92672">.</span>Module,
+</span></span><span style="display:flex;"><span>                 device: torch<span style="color:#f92672">.</span>device):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span>__init__()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>encoder <span style="color:#f92672">=</span> encoder
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>decoder <span style="color:#f92672">=</span> decoder
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>device <span style="color:#f92672">=</span> device
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self,
+</span></span><span style="display:flex;"><span>                src: Tensor,
+</span></span><span style="display:flex;"><span>                trg: Tensor,
+</span></span><span style="display:flex;"><span>                teacher_forcing_ratio: float <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">-&gt;</span> Tensor:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        batch_size <span style="color:#f92672">=</span> src<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        max_len <span style="color:#f92672">=</span> trg<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        trg_vocab_size <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>decoder<span style="color:#f92672">.</span>output_dim
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        outputs <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>zeros(max_len, batch_size, trg_vocab_size)<span style="color:#f92672">.</span>to(self<span style="color:#f92672">.</span>device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        encoder_outputs, hidden <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>encoder(src)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># first input to the decoder is the &lt;sos&gt; token</span>
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> trg[<span style="color:#ae81ff">0</span>,:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> t <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, max_len):
+</span></span><span style="display:flex;"><span>            output, hidden <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>decoder(output, hidden, encoder_outputs)
+</span></span><span style="display:flex;"><span>            outputs[t] <span style="color:#f92672">=</span> output
+</span></span><span style="display:flex;"><span>            teacher_force <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>random() <span style="color:#f92672">&lt;</span> teacher_forcing_ratio
+</span></span><span style="display:flex;"><span>            top1 <span style="color:#f92672">=</span> output<span style="color:#f92672">.</span>max(<span style="color:#ae81ff">1</span>)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> (trg[t] <span style="color:#66d9ef">if</span> teacher_force <span style="color:#66d9ef">else</span> top1)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> outputs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>INPUT_DIM <span style="color:#f92672">=</span> len(zh_vocab)
+</span></span><span style="display:flex;"><span>OUTPUT_DIM <span style="color:#f92672">=</span> len(en_vocab)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ENC_EMB_DIM = 256</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># DEC_EMB_DIM = 256</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ENC_HID_DIM = 512</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># DEC_HID_DIM = 512</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ATTN_DIM = 64</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ENC_DROPOUT = 0.5</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># DEC_DROPOUT = 0.5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ENC_EMB_DIM <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>
+</span></span><span style="display:flex;"><span>DEC_EMB_DIM <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>
+</span></span><span style="display:flex;"><span>ENC_HID_DIM <span style="color:#f92672">=</span> <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>DEC_HID_DIM <span style="color:#f92672">=</span> <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>ATTN_DIM <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>ENC_DROPOUT <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>
+</span></span><span style="display:flex;"><span>DEC_DROPOUT <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>enc <span style="color:#f92672">=</span> Encoder(INPUT_DIM, ENC_EMB_DIM, ENC_HID_DIM, DEC_HID_DIM, ENC_DROPOUT)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>attn <span style="color:#f92672">=</span> Attention(ENC_HID_DIM, DEC_HID_DIM, ATTN_DIM)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dec <span style="color:#f92672">=</span> Decoder(OUTPUT_DIM, DEC_EMB_DIM, ENC_HID_DIM, DEC_HID_DIM, DEC_DROPOUT, attn)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>device <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>device(<span style="color:#e6db74">&#39;cuda&#39;</span> <span style="color:#66d9ef">if</span> torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>is_available() <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;cpu&#39;</span>)
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> Seq2Seq(enc, dec, device)<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init_weights</span>(m: nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> name, param <span style="color:#f92672">in</span> m<span style="color:#f92672">.</span>named_parameters():
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;weight&#39;</span> <span style="color:#f92672">in</span> name:
+</span></span><span style="display:flex;"><span>            nn<span style="color:#f92672">.</span>init<span style="color:#f92672">.</span>normal_(param<span style="color:#f92672">.</span>data, mean<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, std<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            nn<span style="color:#f92672">.</span>init<span style="color:#f92672">.</span>constant_(param<span style="color:#f92672">.</span>data, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>apply(init_weights)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>optimizer <span style="color:#f92672">=</span> optim<span style="color:#f92672">.</span>Adam(model<span style="color:#f92672">.</span>parameters())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">count_parameters</span>(model: nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sum(p<span style="color:#f92672">.</span>numel() <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters() <span style="color:#66d9ef">if</span> p<span style="color:#f92672">.</span>requires_grad)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;The model has </span><span style="color:#e6db74">{</span>count_parameters(model)<span style="color:#e6db74">:</span><span style="color:#e6db74">,</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> trainable parameters&#39;</span>)
+</span></span></code></pre></div><pre><code>The model has 705,280 trainable parameters
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>PAD_IDX <span style="color:#f92672">=</span> en_vocab[<span style="color:#e6db74">&#39;&lt;pad&gt;&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>criterion <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>CrossEntropyLoss(ignore_index<span style="color:#f92672">=</span>PAD_IDX)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> math
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">train</span>(model: nn<span style="color:#f92672">.</span>Module,
+</span></span><span style="display:flex;"><span>          iterator: torch<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>DataLoader,
+</span></span><span style="display:flex;"><span>          optimizer: optim<span style="color:#f92672">.</span>Optimizer,
+</span></span><span style="display:flex;"><span>          criterion: nn<span style="color:#f92672">.</span>Module,
+</span></span><span style="display:flex;"><span>          clip: float):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>train()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    epoch_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _, batch <span style="color:#f92672">in</span> enumerate(iterator):
+</span></span><span style="display:flex;"><span>        src <span style="color:#f92672">=</span> batch[<span style="color:#e6db74">&#34;zh_ids&#34;</span>]<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>        trg <span style="color:#f92672">=</span> batch[<span style="color:#e6db74">&#34;en_ids&#34;</span>]<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>zero_grad()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> model(src, trg)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> output[<span style="color:#ae81ff">1</span>:]<span style="color:#f92672">.</span>view(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, output<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>        trg <span style="color:#f92672">=</span> trg[<span style="color:#ae81ff">1</span>:]<span style="color:#f92672">.</span>view(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> criterion(output, trg)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        loss<span style="color:#f92672">.</span>backward()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        torch<span style="color:#f92672">.</span>nn<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>clip_grad_norm_(model<span style="color:#f92672">.</span>parameters(), clip)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        optimizer<span style="color:#f92672">.</span>step()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        epoch_loss <span style="color:#f92672">+=</span> loss<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> epoch_loss <span style="color:#f92672">/</span> len(iterator)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">evaluate</span>(model: nn<span style="color:#f92672">.</span>Module,
+</span></span><span style="display:flex;"><span>             iterator: torch<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>DataLoader,
+</span></span><span style="display:flex;"><span>             criterion: nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>eval()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    epoch_loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> _, batch <span style="color:#f92672">in</span> enumerate(iterator):
+</span></span><span style="display:flex;"><span>            src <span style="color:#f92672">=</span> batch[<span style="color:#e6db74">&#34;zh_ids&#34;</span>]<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>            trg <span style="color:#f92672">=</span> batch[<span style="color:#e6db74">&#34;en_ids&#34;</span>]<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> model(src, trg, <span style="color:#ae81ff">0</span>) <span style="color:#75715e">#turn off teacher forcing</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> output[<span style="color:#ae81ff">1</span>:]<span style="color:#f92672">.</span>view(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, output<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>            trg <span style="color:#f92672">=</span> trg[<span style="color:#ae81ff">1</span>:]<span style="color:#f92672">.</span>view(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            loss <span style="color:#f92672">=</span> criterion(output, trg)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            epoch_loss <span style="color:#f92672">+=</span> loss<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> epoch_loss <span style="color:#f92672">/</span> len(iterator)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">epoch_time</span>(start_time: int,
+</span></span><span style="display:flex;"><span>               end_time: int):
+</span></span><span style="display:flex;"><span>    elapsed_time <span style="color:#f92672">=</span> end_time <span style="color:#f92672">-</span> start_time
+</span></span><span style="display:flex;"><span>    elapsed_mins <span style="color:#f92672">=</span> int(elapsed_time <span style="color:#f92672">/</span> <span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>    elapsed_secs <span style="color:#f92672">=</span> int(elapsed_time <span style="color:#f92672">-</span> (elapsed_mins <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> elapsed_mins, elapsed_secs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>N_EPOCHS <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>CLIP <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>best_valid_loss <span style="color:#f92672">=</span> float(<span style="color:#e6db74">&#39;inf&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> epoch <span style="color:#f92672">in</span> range(N_EPOCHS):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    train_loss <span style="color:#f92672">=</span> train(model, train_data_loader, optimizer, criterion, CLIP)
+</span></span><span style="display:flex;"><span>    valid_loss <span style="color:#f92672">=</span> evaluate(model, valid_data_loader, criterion)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    epoch_mins, epoch_secs <span style="color:#f92672">=</span> epoch_time(start_time, end_time)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Epoch: </span><span style="color:#e6db74">{</span>epoch<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">:</span><span style="color:#e6db74">02</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> | Time: </span><span style="color:#e6db74">{</span>epoch_mins<span style="color:#e6db74">}</span><span style="color:#e6db74">m </span><span style="color:#e6db74">{</span>epoch_secs<span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">Train Loss: </span><span style="color:#e6db74">{</span>train_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> | Train PPL: </span><span style="color:#e6db74">{</span>math<span style="color:#f92672">.</span>exp(train_loss)<span style="color:#e6db74">:</span><span style="color:#e6db74">7.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74"> Val. Loss: </span><span style="color:#e6db74">{</span>valid_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> |  Val. PPL: </span><span style="color:#e6db74">{</span>math<span style="color:#f92672">.</span>exp(valid_loss)<span style="color:#e6db74">:</span><span style="color:#e6db74">7.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>test_loss <span style="color:#f92672">=</span> evaluate(model, test_data_loader, criterion)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;| Test Loss: </span><span style="color:#e6db74">{</span>test_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> | Test PPL: </span><span style="color:#e6db74">{</span>math<span style="color:#f92672">.</span>exp(test_loss)<span style="color:#e6db74">:</span><span style="color:#e6db74">7.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> |&#39;</span>)
+</span></span></code></pre></div><pre><code>Epoch: 01 | Time: 0m 29s
+	Train Loss: 6.448 | Train PPL: 631.691
+	 Val. Loss: 5.159 |  Val. PPL: 173.998
+Epoch: 02 | Time: 0m 29s
+	Train Loss: 5.424 | Train PPL: 226.829
+	 Val. Loss: 5.115 |  Val. PPL: 166.535
+Epoch: 03 | Time: 0m 32s
+	Train Loss: 5.389 | Train PPL: 218.945
+	 Val. Loss: 5.106 |  Val. PPL: 164.973
+Epoch: 04 | Time: 0m 29s
+	Train Loss: 5.341 | Train PPL: 208.635
+	 Val. Loss: 5.093 |  Val. PPL: 162.901
+Epoch: 05 | Time: 0m 30s
+	Train Loss: 5.276 | Train PPL: 195.584
+	 Val. Loss: 5.072 |  Val. PPL: 159.484
+Epoch: 06 | Time: 0m 30s
+	Train Loss: 5.226 | Train PPL: 186.118
+	 Val. Loss: 5.071 |  Val. PPL: 159.297
+Epoch: 07 | Time: 0m 30s
+	Train Loss: 5.182 | Train PPL: 178.052
+	 Val. Loss: 5.052 |  Val. PPL: 156.343
+Epoch: 08 | Time: 0m 29s
+	Train Loss: 5.148 | Train PPL: 172.126
+	 Val. Loss: 5.181 |  Val. PPL: 177.789
+Epoch: 09 | Time: 0m 30s
+	Train Loss: 5.129 | Train PPL: 168.898
+	 Val. Loss: 5.066 |  Val. PPL: 158.581
+Epoch: 10 | Time: 0m 30s
+	Train Loss: 5.097 | Train PPL: 163.591
+	 Val. Loss: 5.056 |  Val. PPL: 156.962
+Epoch: 11 | Time: 0m 30s
+	Train Loss: 5.065 | Train PPL: 158.334
+	 Val. Loss: 5.056 |  Val. PPL: 157.013
+Epoch: 12 | Time: 0m 32s
+	Train Loss: 5.051 | Train PPL: 156.112
+	 Val. Loss: 5.058 |  Val. PPL: 157.213
+Epoch: 13 | Time: 0m 28s
+	Train Loss: 5.022 | Train PPL: 151.783
+	 Val. Loss: 5.056 |  Val. PPL: 156.904
+Epoch: 14 | Time: 0m 30s
+	Train Loss: 5.002 | Train PPL: 148.745
+	 Val. Loss: 5.061 |  Val. PPL: 157.755
+Epoch: 15 | Time: 0m 30s
+	Train Loss: 4.997 | Train PPL: 147.900
+	 Val. Loss: 5.043 |  Val. PPL: 154.944
+Epoch: 16 | Time: 0m 31s
+	Train Loss: 4.959 | Train PPL: 142.479
+	 Val. Loss: 5.039 |  Val. PPL: 154.370
+Epoch: 17 | Time: 0m 29s
+	Train Loss: 4.956 | Train PPL: 142.024
+	 Val. Loss: 5.028 |  Val. PPL: 152.690
+Epoch: 18 | Time: 0m 32s
+	Train Loss: 4.945 | Train PPL: 140.411
+	 Val. Loss: 5.038 |  Val. PPL: 154.084
+Epoch: 19 | Time: 0m 31s
+	Train Loss: 4.920 | Train PPL: 137.013
+	 Val. Loss: 5.051 |  Val. PPL: 156.189
+Epoch: 20 | Time: 0m 32s
+	Train Loss: 4.935 | Train PPL: 139.133
+	 Val. Loss: 5.028 |  Val. PPL: 152.704
+Epoch: 21 | Time: 0m 31s
+	Train Loss: 4.910 | Train PPL: 135.631
+	 Val. Loss: 5.029 |  Val. PPL: 152.842
+Epoch: 22 | Time: 0m 28s
+	Train Loss: 4.893 | Train PPL: 133.382
+	 Val. Loss: 5.063 |  Val. PPL: 158.006
+Epoch: 23 | Time: 0m 30s
+	Train Loss: 4.894 | Train PPL: 133.473
+	 Val. Loss: 5.016 |  Val. PPL: 150.787
+Epoch: 24 | Time: 0m 28s
+	Train Loss: 4.859 | Train PPL: 128.943
+	 Val. Loss: 5.031 |  Val. PPL: 153.023
+Epoch: 25 | Time: 0m 32s
+	Train Loss: 4.833 | Train PPL: 125.593
+	 Val. Loss: 5.039 |  Val. PPL: 154.311
+Epoch: 26 | Time: 0m 29s
+	Train Loss: 4.817 | Train PPL: 123.649
+	 Val. Loss: 5.043 |  Val. PPL: 154.984
+Epoch: 27 | Time: 0m 31s
+	Train Loss: 4.832 | Train PPL: 125.487
+	 Val. Loss: 5.028 |  Val. PPL: 152.619
+Epoch: 28 | Time: 0m 28s
+	Train Loss: 4.858 | Train PPL: 128.742
+	 Val. Loss: 5.022 |  Val. PPL: 151.751
+Epoch: 29 | Time: 0m 29s
+	Train Loss: 4.803 | Train PPL: 121.851
+	 Val. Loss: 5.018 |  Val. PPL: 151.088
+Epoch: 30 | Time: 0m 31s
+	Train Loss: 4.798 | Train PPL: 121.319
+	 Val. Loss: 5.016 |  Val. PPL: 150.873
+| Test Loss: 5.003 | Test PPL: 148.800 |
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>test_loss <span style="color:#f92672">=</span> evaluate(model, test_data_loader, criterion)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;| Test Loss: </span><span style="color:#e6db74">{</span>test_loss<span style="color:#e6db74">:</span><span style="color:#e6db74">.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> | Test PPL: </span><span style="color:#e6db74">{</span>np<span style="color:#f92672">.</span>exp(test_loss)<span style="color:#e6db74">:</span><span style="color:#e6db74">7.3f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> |&#34;</span>)
+</span></span></code></pre></div><pre><code>| Test Loss: 5.003 | Test PPL: 148.800 |
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">translate_sentence</span>(
+</span></span><span style="display:flex;"><span>    sentence,
+</span></span><span style="display:flex;"><span>    model,
+</span></span><span style="display:flex;"><span>    en_nlp,
+</span></span><span style="display:flex;"><span>    zh_nlp,
+</span></span><span style="display:flex;"><span>    en_vocab,
+</span></span><span style="display:flex;"><span>    zh_vocab,
+</span></span><span style="display:flex;"><span>    sos_token,
+</span></span><span style="display:flex;"><span>    eos_token,
+</span></span><span style="display:flex;"><span>    device,
+</span></span><span style="display:flex;"><span>    max_output_length<span style="color:#f92672">=</span><span style="color:#ae81ff">25</span>,
+</span></span><span style="display:flex;"><span>):
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>eval()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>        tokens <span style="color:#f92672">=</span> [token<span style="color:#f92672">.</span>text <span style="color:#66d9ef">for</span> token <span style="color:#f92672">in</span> zh_nlp(sentence)]
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Add &lt;sos&gt; and &lt;eos&gt; tokens</span>
+</span></span><span style="display:flex;"><span>        tokens<span style="color:#f92672">.</span>insert(<span style="color:#ae81ff">0</span>, sos_token)
+</span></span><span style="display:flex;"><span>        tokens<span style="color:#f92672">.</span>append(eos_token)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Convert tokens to indices</span>
+</span></span><span style="display:flex;"><span>        src_indexes <span style="color:#f92672">=</span> zh_vocab<span style="color:#f92672">.</span>lookup_indices(tokens)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Convert the indices to a PyTorch tensor and unsqueeze for batch dimension</span>
+</span></span><span style="display:flex;"><span>        src_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>LongTensor(src_indexes)<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>        encoder_outputs, hidden <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>encoder(src_tensor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        inputs <span style="color:#f92672">=</span> en_vocab<span style="color:#f92672">.</span>lookup_indices([sos_token])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(max_output_length):
+</span></span><span style="display:flex;"><span>            trg_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>LongTensor([inputs[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]])<span style="color:#f92672">.</span>to(device)
+</span></span><span style="display:flex;"><span>            output, hidden <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>decoder(trg_tensor, hidden, encoder_outputs)
+</span></span><span style="display:flex;"><span>            trg_token <span style="color:#f92672">=</span> output<span style="color:#f92672">.</span>argmax(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>            inputs<span style="color:#f92672">.</span>append(trg_token)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> trg_token <span style="color:#f92672">==</span> en_vocab[eos_token]:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        tokens <span style="color:#f92672">=</span> en_vocab<span style="color:#f92672">.</span>lookup_tokens(inputs)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokens
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sentence <span style="color:#f92672">=</span> train_data[<span style="color:#ae81ff">1</span>][<span style="color:#e6db74">&#34;zh-cn&#34;</span>]
+</span></span><span style="display:flex;"><span>expected_translation <span style="color:#f92672">=</span> train_data[<span style="color:#ae81ff">1</span>][<span style="color:#e6db74">&#34;en&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sentence, expected_translation
+</span></span></code></pre></div><pre><code>('能有第二次站在这个台上的机会 , 我真是非常感激 。',
+ &quot;And it's truly a great honor to have the opportunity to come to this stage twice ; I'm extremely grateful .&quot;)
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>translation <span style="color:#f92672">=</span> translate_sentence(
+</span></span><span style="display:flex;"><span>    sentence,
+</span></span><span style="display:flex;"><span>    model,
+</span></span><span style="display:flex;"><span>    en_nlp,
+</span></span><span style="display:flex;"><span>    zh_nlp,
+</span></span><span style="display:flex;"><span>    en_vocab,
+</span></span><span style="display:flex;"><span>    zh_vocab,
+</span></span><span style="display:flex;"><span>    sos_token,
+</span></span><span style="display:flex;"><span>    eos_token,
+</span></span><span style="display:flex;"><span>    device,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>translation
+</span></span></code></pre></div><pre><code>['&lt;sos&gt;',
+ 'and',
+ 'i',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ ',',
+ '&lt;unk&gt;',
+ ',',
+ '&lt;unk&gt;',
+ ',',
+ '&lt;unk&gt;',
+ ',',
+ '&lt;unk&gt;',
+ ',',
+ '&lt;unk&gt;']
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>jupyter nbconvert sqtosq1<span style="color:#f92672">.</span>ipynb <span style="color:#f92672">--</span>to markdown
+</span></span></code></pre></div><pre><code>[NbConvertApp] Converting notebook sqtosq1.ipynb to markdown
+[NbConvertApp] Writing 287118 bytes to sqtosq1.md
+</code></pre>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

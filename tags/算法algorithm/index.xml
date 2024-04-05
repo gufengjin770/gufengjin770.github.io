@@ -6,8 +6,15 @@
     <description>Recent content in 算法algorithm on 金谷风的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Mar 2024 13:24:55 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 05 Apr 2024 23:58:23 +0100</lastBuildDate>
     <atom:link href="https://gufengjin770.github.io/tags/%E7%AE%97%E6%B3%95algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Seq to Seq</title>
+      <link>https://gufengjin770.github.io/post/seq-to-seq/</link>
+      <pubDate>Fri, 05 Apr 2024 23:58:23 +0100</pubDate>
+      <guid>https://gufengjin770.github.io/post/seq-to-seq/</guid>
+      <description>import pandas as pd import re import numpy as np import spacy import datasets import torchtext import tqdm import evaluate from datasets import Dataset, DatasetDict import random from typing import Tuple import torch import torch.nn as nn import torch.optim as optim import torch.nn.functional as F from torch import Tensor c:\Users\gufen\AppData\Local\Programs\Python\Python311\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html from .autonotebook import tqdm as notebook_tqdm file_path = &amp;#39;G:\\ted2020.tsv&amp;#39; column_data = pd.</description>
+    </item>
     <item>
       <title>Hierarchical_clustering</title>
       <link>https://gufengjin770.github.io/post/hierarchical_clustering/</link>
